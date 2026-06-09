@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Container from "@/components/atomic/container";
-import { GraduationCap, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { GraduationCap, Eye, EyeOff, ArrowLeft, Upload, X } from "lucide-react";
 import { useRegisterAlumni } from "@/services/alumni/hook";
+import AxiosClient from "@/lib/axios";
 
 export default function AlumniRegisterPage() {
   const router = useRouter();
@@ -13,11 +14,15 @@ export default function AlumniRegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [photoPreview, setPhotoPreview] = useState("");
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
     contactNumber: "",
     graduationYear: "",
     degree: "",
@@ -30,6 +35,36 @@ export default function AlumniRegisterPage() {
     setError("");
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Ukuran foto maksimal 5MB");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      setError("Hanya file gambar yang diizinkan");
+      return;
+    }
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  };
+
+  const uploadPhoto = async (file: File): Promise<string | null> => {
+    try {
+      const reader = new FileReader();
+      const base64 = await new Promise<string>((resolve, reject) => {
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const { data } = await AxiosClient.post("/upload/image", { image: base64 });
+      return data.data.url;
+    } catch {
+      return null;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -38,6 +73,21 @@ export default function AlumniRegisterPage() {
     if (!form.name || !form.email || !form.password || !form.graduationYear) {
       setError("Nama, email, password, dan tahun kelulusan wajib diisi");
       return;
+    }
+
+    if (form.password.length < 6) {
+      setError("Password minimal 6 karakter");
+      return;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      setError("Konfirmasi password tidak cocok");
+      return;
+    }
+
+    let photoUrl: string | null = null;
+    if (photoFile) {
+      photoUrl = await uploadPhoto(photoFile);
     }
 
     register(
@@ -50,6 +100,7 @@ export default function AlumniRegisterPage() {
         degree: form.degree || null,
         specialization: form.specialization || null,
         institution: form.institution || null,
+        photo: photoUrl,
       },
       {
         onSuccess: (data: any) => {
@@ -62,12 +113,15 @@ export default function AlumniRegisterPage() {
               name: "",
               email: "",
               password: "",
+              confirmPassword: "",
               contactNumber: "",
               graduationYear: "",
               degree: "",
               specialization: "",
               institution: "",
             });
+            setPhotoPreview("");
+            setPhotoFile(null);
           } else {
             setError(data.message || "Registrasi gagal");
           }
@@ -128,6 +182,50 @@ export default function AlumniRegisterPage() {
             onSubmit={handleSubmit}
             className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 space-y-5"
           >
+            {/* Photo Upload */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Foto (opsional)
+              </label>
+              <div className="flex items-center gap-4">
+                {photoPreview ? (
+                  <div className="relative">
+                    <img
+                      src={photoPreview}
+                      alt="Preview"
+                      className="w-20 h-20 rounded-full object-cover border-2 border-slate-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPhotoPreview("");
+                        setPhotoFile(null);
+                      }}
+                      className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <label className="w-20 h-20 border-2 border-dashed border-slate-200 rounded-full flex flex-col items-center justify-center cursor-pointer hover:border-brand-dark hover:bg-slate-50 transition-colors">
+                    <Upload className="w-4 h-4 text-slate-300" />
+                    <span className="text-[9px] text-slate-400 mt-0.5">Upload</span>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+                <p className="text-xs text-slate-400">
+                  Format: JPG, PNG, WebP<br />
+                  Maks: 5MB
+                </p>
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Nama Lengkap *
@@ -141,19 +239,20 @@ export default function AlumniRegisterPage() {
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Email *
+              </label>
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) => updateField("email", e.target.value)}
+                placeholder="john@example.com"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-transparent"
+              />
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => updateField("email", e.target.value)}
-                  placeholder="john@example.com"
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-transparent"
-                />
-              </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
                   Password *
@@ -178,6 +277,18 @@ export default function AlumniRegisterPage() {
                     )}
                   </button>
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Konfirmasi Password *
+                </label>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={form.confirmPassword}
+                  onChange={(e) => updateField("confirmPassword", e.target.value)}
+                  placeholder="Ulangi password"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-transparent"
+                />
               </div>
             </div>
 
@@ -252,8 +363,8 @@ export default function AlumniRegisterPage() {
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-700">
               <p className="font-medium">Perhatian:</p>
               <p>
-                Akun yang didaftarkan melalui form ini memerlukan persetujuan
-                admin sebelum tampil di halaman alumni.
+                Anda dapat login segera setelah registrasi. Namun data Anda akan
+                tampil di halaman alumni setelah disetujui oleh admin.
               </p>
             </div>
 

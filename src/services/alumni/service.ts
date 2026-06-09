@@ -10,6 +10,7 @@ export interface AlumniItem {
   specialization: string | null;
   institution: string | null;
   photo: string | null;
+  isApproved: boolean;
 }
 
 export interface AlumniListResponse {
@@ -19,6 +20,15 @@ export interface AlumniListResponse {
   page: number;
   perPage: number;
   totalPages: number;
+}
+
+export interface AlumniAuthData {
+  id: number;
+  name: string;
+  email: string;
+  photo: string | null;
+  isApproved: boolean;
+  access_token: string;
 }
 
 export async function fetchAlumniList(params: {
@@ -55,6 +65,7 @@ export async function registerAlumni(payload: {
   degree?: string | null;
   specialization?: string | null;
   institution?: string | null;
+  photo?: string | null;
 }) {
   const { data } = await AxiosClient.post("/alumni/register", payload);
   return data;
@@ -65,14 +76,26 @@ export async function loginAlumni(payload: {
   password: string;
 }) {
   const { data } = await AxiosClient.post("/alumni/login", payload);
-  return data as {
-    status: number;
-    message: string;
-    data: {
-      id: number;
-      name: string;
-      email: string;
-      access_token: string;
-    };
-  };
+  return data as { status: number; message: string; data: AlumniAuthData };
+}
+
+export async function fetchMyProfile() {
+  const { data } = await AxiosClient.get("/alumni/me");
+  return data.data as AlumniItem;
+}
+
+export async function updateMyProfile(payload: {
+  name?: string;
+  email?: string | null;
+  contactNumber?: string | null;
+  graduationYear?: number;
+  degree?: string | null;
+  specialization?: string | null;
+  institution?: string | null;
+  password?: string;
+  photo?: string | null;
+  removePhoto?: boolean;
+}) {
+  const { data } = await AxiosClient.put("/alumni/me", payload);
+  return data.data as AlumniItem;
 }

@@ -4,8 +4,9 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Menu, X, Phone, Mail, ChevronDown } from "lucide-react";
+import { Menu, X, Phone, Mail, ChevronDown, User, LogOut } from "lucide-react";
 import { useSiteSettings } from "@/services/setting/hook";
+import { useMyProfile } from "@/services/alumni/hook";
 
 const navLinks = [
   { label: "Beranda", href: "/" },
@@ -28,10 +29,25 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [profileDropdown, setProfileDropdown] = useState(false);
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem("alumni_token"));
+  }, []);
+
+  const { data: alumni } = useMyProfile();
 
   const siteName = settings?.site_name || "IDOMAIN";
   const phone = settings?.contact_phone || "";
   const email = settings?.contact_email || "";
+
+  const handleLogout = () => {
+    localStorage.removeItem("alumni_token");
+    setIsLoggedIn(false);
+    setProfileDropdown(false);
+    window.location.href = "/";
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -94,10 +110,10 @@ export default function Navbar() {
 
         {/* Main Navbar */}
         <div
-          className={`flex justify-between text-white items-center transition-all duration-300 ${
+          className={`flex justify-between items-center transition-all duration-300 ${
             isScrolled
-              ? "bg-brand-dark/70 shadow-lg px-[3%]"
-              : "bg-gradient-to-b from-black to-transparent px-[5%] md:px-[7%] lg:px-[10%]"
+              ? "bg-white px-[3%] text-brand-dark"
+              : "bg-gradient-to-b from-black to-transparent px-[5%] md:px-[7%] lg:px-[10%] text-white"
           }`}
         >
           {/* Logo */}
@@ -136,8 +152,8 @@ export default function Navbar() {
                     onMouseLeave={() => setActiveDropdown(null)}
                   >
                     <button
-                      className={`relative flex items-center gap-1 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:bg-brand-mint after:transition-all after:duration-300 hover:after:w-full ${
-                        path === link.href ? "text-white font-semibold" : ""
+                      className={`relative flex items-center gap-1 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:bg-brand-steel after:transition-all after:duration-300 hover:after:w-full ${
+                        path === link.href ? "font-semibold" : ""
                       }`}
                     >
                       {link.label}
@@ -174,7 +190,7 @@ export default function Navbar() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className={`relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:bg-brand-mint after:transition-all after:duration-300 ${
+                  className={`relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:bg-brand-steel after:transition-all after:duration-300 ${
                     isActive
                       ? "font-semibold after:w-full"
                       : "after:w-0 hover:after:w-full"
@@ -184,6 +200,76 @@ export default function Navbar() {
                 </Link>
               );
             })}
+
+            {/* Auth / Profile */}
+            {isLoggedIn ? (
+              <div
+                className="relative"
+                onMouseEnter={() => setProfileDropdown(true)}
+                onMouseLeave={() => setProfileDropdown(false)}
+              >
+                <button className="flex items-center gap-2">
+                  {alumni?.photo ? (
+                    <img
+                      src={alumni.photo}
+                      alt={alumni.name}
+                      className="w-7 h-7 rounded-full object-cover border-2 border-white/40"
+                    />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
+                      <User className="w-4 h-4" />
+                    </div>
+                  )}
+                  <ChevronDown
+                    className={`w-3 h-3 transition-transform duration-300 ${
+                      profileDropdown ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                <div
+                  className={`absolute top-full right-0 mt-2 bg-white rounded-lg shadow-xl overflow-hidden transition-all duration-300 min-w-[200px] ${
+                    profileDropdown
+                      ? "opacity-100 visible translate-y-0"
+                      : "opacity-0 invisible -translate-y-2"
+                  }`}
+                >
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-semibold text-gray-800 truncate">
+                      {alumni?.name || "Alumni"}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {alumni?.email || ""}
+                    </p>
+                    {alumni && !alumni.isApproved && (
+                      <p className="text-xs text-amber-600 mt-1">
+                        Menunggu persetujuan
+                      </p>
+                    )}
+                  </div>
+                  <Link
+                    href="/alumni/profile"
+                    className="flex items-center gap-2 px-4 py-3 text-gray-800 hover:bg-brand-dark hover:text-white transition-colors text-sm"
+                  >
+                    <User className="w-4 h-4" />
+                    Profil Saya
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 px-4 py-3 text-red-600 hover:bg-red-50 transition-colors text-sm w-full text-left"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Keluar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <Link
+                href="/alumni/login"
+                className={`${isScrolled ? "text-white bg-brand-dark hover:bg-brand-steel px-5 py-3 " : "text-brand-mint"} text-sm rounded-lg font-medium transition-colors`}
+              >
+                Daftar Alumni
+              </Link>
+            )}
           </div>
 
           {/* Mobile Toggle */}
@@ -271,6 +357,72 @@ export default function Navbar() {
                 )}
               </div>
             ))}
+
+            {/* Mobile Auth */}
+            <div className="border-t border-gray-200 mt-4 pt-4 px-6 space-y-2">
+              {isLoggedIn ? (
+                <>
+                  <div className="flex items-center gap-3 py-2">
+                    {alumni?.photo ? (
+                      <img
+                        src={alumni.photo}
+                        alt={alumni.name}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-brand-dark/10 flex items-center justify-center">
+                        <User className="w-4 h-4 text-brand-dark" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-800 truncate">
+                        {alumni?.name || "Alumni"}
+                      </p>
+                      {alumni && !alumni.isApproved && (
+                        <p className="text-xs text-amber-600">
+                          Menunggu persetujuan
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <Link
+                    href="/alumni/profile"
+                    onClick={closeSidebar}
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-brand-dark hover:bg-brand-dark/5 rounded-lg"
+                  >
+                    <User className="w-4 h-4" />
+                    Profil Saya
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      closeSidebar();
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg w-full"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Keluar
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/alumni/login"
+                    onClick={closeSidebar}
+                    className="block w-full text-center py-2.5 bg-brand-dark text-white rounded-lg text-sm font-medium hover:bg-brand-dark-hover transition-colors"
+                  >
+                    Login Alumni
+                  </Link>
+                  <Link
+                    href="/alumni/register"
+                    onClick={closeSidebar}
+                    className="block w-full text-center py-2.5 border border-brand-dark text-brand-dark rounded-lg text-sm font-medium hover:bg-brand-dark/5 transition-colors"
+                  >
+                    Daftar Alumni
+                  </Link>
+                </>
+              )}
+            </div>
           </nav>
         </div>
       </aside>

@@ -30,11 +30,10 @@ export default function AlumniLoginPage() {
     login(form, {
       onSuccess: (data: any) => {
         if (data.status === 200) {
-          // Store token if needed for future alumni features
           if (typeof window !== "undefined" && data.data?.access_token) {
             localStorage.setItem("alumni_token", data.data.access_token);
           }
-          router.push("/alumni");
+          router.push("/alumni/profile");
         } else {
           setError(data.message || "Login gagal");
         }

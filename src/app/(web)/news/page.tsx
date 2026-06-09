@@ -57,7 +57,7 @@ export default function NewsPage() {
 
       {/* Search */}
       <section className="px-[5%] md:px-[7%] lg:px-[10%] pt-8 w-full">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-full mx-auto">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400" />
             <input
@@ -87,7 +87,7 @@ export default function NewsPage() {
 
       {/* News List */}
       <section className="px-[5%] md:px-[7%] lg:px-[10%] py-8 md:py-16 w-full">
-        <div className="max-w-3xl mx-auto space-y-8">
+        <div className="max-w-full mx-auto space-y-8">
           {isLoading ? (
             Array.from({ length: 3 }).map((_, i) => (
               <div

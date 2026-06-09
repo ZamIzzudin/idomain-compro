@@ -7,7 +7,7 @@ import { useArticleList } from "@/services/article/hook";
 export default function NewsSection() {
   const { data, isLoading } = useArticleList({
     page: 1,
-    limit: 6,
+    limit: 3,
     status: "PUBLISHED",
     sortOrder: "desc",
   });
@@ -48,7 +48,7 @@ export default function NewsSection() {
         {/* News Grid */}
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
+            {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
                 className="bg-white rounded-xl overflow-hidden shadow-sm animate-pulse"

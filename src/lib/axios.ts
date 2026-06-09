@@ -29,6 +29,12 @@ class ApiClient {
   private setupInterceptors() {
     this.instance.interceptors.request.use(
       (config) => {
+        if (typeof window !== "undefined") {
+          const token = localStorage.getItem("alumni_token");
+          if (token && config.headers) {
+            config.headers["Authorization"] = `Bearer ${token}`;
+          }
+        }
         return config;
       },
       (error) => {
