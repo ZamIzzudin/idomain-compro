@@ -1,0 +1,464 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import Container from "@/components/atomic/container";
+import { useDebounce } from "@/hooks/useDebounce";
+import {
+  Search,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  GraduationCap,
+  Building2,
+  Award,
+  Phone,
+  Mail,
+  Calendar,
+  UserPlus,
+  LogIn,
+} from "lucide-react";
+import { useAlumniList, useAlumniFilterOptions } from "@/services/alumni/hook";
+import type { AlumniItem } from "@/services/alumni/service";
+
+const PER_PAGE = 12;
+
+export default function AlumniPage() {
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [filterYear, setFilterYear] = useState<number | undefined>(undefined);
+  const [filterSpec, setFilterSpec] = useState<string | undefined>(undefined);
+  const [sort, setSort] = useState("newest");
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedAlumni, setSelectedAlumni] = useState<AlumniItem | null>(null);
+
+  const debouncedSearch = useDebounce(search);
+
+  const { data, isLoading } = useAlumniList({
+    page,
+    perPage: PER_PAGE,
+    q: debouncedSearch || undefined,
+    graduationYear: filterYear,
+    specialization: filterSpec,
+    sort,
+  });
+
+  const { data: filterOptions } = useAlumniFilterOptions();
+
+  const alumni = data?.items || [];
+  const totalPages = data?.totalPages || 1;
+  const total = data?.total || 0;
+
+  const resetFilters = () => {
+    setFilterYear(undefined);
+    setFilterSpec(undefined);
+    setSort("newest");
+    setPage(1);
+  };
+
+  return (
+    <Container>
+      {/* Hero */}
+      <section className="bg-brand-dark text-white py-20 px-[5%] md:px-[7%] lg:px-[10%] w-full">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-[32px] md:text-[48px] font-bold mb-4 flex items-center justify-center gap-3">
+            <GraduationCap className="w-10 h-10" />
+            Alumni
+          </h1>
+          <p className="text-gray-300 text-base md:text-lg mb-6">
+            Temukan dan terhubung dengan sesama alumni dokter
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <Link
+              href="/alumni/register"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-brand-dark rounded-xl font-medium text-sm hover:bg-gray-100 transition-colors"
+            >
+              <UserPlus className="w-4 h-4" />
+              Daftar Alumni
+            </Link>
+            <Link
+              href="/alumni/login"
+              className="inline-flex items-center gap-2 px-5 py-2.5 border border-white/30 text-white rounded-xl font-medium text-sm hover:bg-white/10 transition-colors"
+            >
+              <LogIn className="w-4 h-4" />
+              Login
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Search & Filter */}
+      <section className="px-[5%] md:px-[7%] lg:px-[10%] py-8 w-full bg-gray-50">
+        <div className="max-w-6xl mx-auto space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="flex-1 relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Cari alumni berdasarkan nama, instansi, spesialisasi..."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+                className="w-full pl-12 pr-10 py-3 bg-white border border-slate-200 rounded-xl text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-transparent"
+              />
+              {search && (
+                <button
+                  onClick={() => {
+                    setSearch("");
+                    setPage(1);
+                  }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex items-center gap-2 px-4 py-3 border rounded-xl text-sm font-medium transition-colors ${
+                showFilters
+                  ? "border-brand-dark bg-brand-dark/5 text-brand-dark"
+                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              <Filter className="w-4 h-4" />
+              <span className="hidden sm:inline">Filter</span>
+              {(filterYear || filterSpec) && (
+                <span className="w-2 h-2 bg-brand-dark rounded-full" />
+              )}
+            </button>
+          </div>
+
+          {showFilters && (
+            <div className="flex flex-wrap items-center gap-3 bg-white p-4 rounded-xl border border-slate-200">
+              <select
+                value={filterYear ?? ""}
+                onChange={(e) => {
+                  setFilterYear(
+                    e.target.value ? Number(e.target.value) : undefined,
+                  );
+                  setPage(1);
+                }}
+                className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark"
+              >
+                <option value="">Semua Tahun</option>
+                {filterOptions?.years?.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={filterSpec ?? ""}
+                onChange={(e) => {
+                  setFilterSpec(e.target.value || undefined);
+                  setPage(1);
+                }}
+                className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark"
+              >
+                <option value="">Semua Spesialisasi</option>
+                {filterOptions?.specializations?.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={sort}
+                onChange={(e) => {
+                  setSort(e.target.value);
+                  setPage(1);
+                }}
+                className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark"
+              >
+                <option value="newest">Terbaru</option>
+                <option value="name_asc">Nama A-Z</option>
+                <option value="name_desc">Nama Z-A</option>
+                <option value="year_asc">Tahun (Terlama)</option>
+                <option value="year_desc">Tahun (Terbaru)</option>
+              </select>
+
+              {(filterYear || filterSpec) && (
+                <button
+                  onClick={resetFilters}
+                  className="text-xs text-red-500 hover:text-red-700 font-medium ml-auto"
+                >
+                  Reset Filter
+                </button>
+              )}
+            </div>
+          )}
+
+          <p className="text-sm text-slate-500">
+            Menampilkan {alumni.length} dari {total} alumni
+          </p>
+        </div>
+      </section>
+
+      {/* Alumni Grid */}
+      <section className="px-[5%] md:px-[7%] lg:px-[10%] pb-16 w-full bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-2xl p-6 animate-pulse">
+                  <div className="w-20 h-20 bg-slate-200 rounded-full mx-auto mb-4" />
+                  <div className="h-4 bg-slate-200 rounded w-2/3 mx-auto mb-2" />
+                  <div className="h-3 bg-slate-200 rounded w-1/2 mx-auto" />
+                </div>
+              ))}
+            </div>
+          ) : alumni.length === 0 ? (
+            <div className="text-center py-16">
+              <GraduationCap className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+              <p className="text-slate-500 text-lg">
+                Tidak ada alumni ditemukan
+              </p>
+              <p className="text-slate-400 text-sm mt-1">
+                Coba ubah kata kunci pencarian atau filter
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {alumni.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => setSelectedAlumni(item)}
+                  className="bg-white rounded-2xl p-6 border border-slate-100 hover:shadow-lg hover:border-slate-200 transition-all group cursor-pointer"
+                >
+                  {/* Photo */}
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-brand-dark to-brand-dark-hover flex items-center justify-center">
+                    {item.photo ? (
+                      <img
+                        src={item.photo}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-white text-2xl font-bold">
+                        {item.name[0]?.toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <div className="text-center">
+                    <h3 className="font-semibold text-slate-800 group-hover:text-brand-dark transition-colors">
+                      {item.name}
+                    </h3>
+
+                    {item.degree && (
+                      <p className="text-xs text-brand-dark font-medium mt-1">
+                        {item.degree}
+                      </p>
+                    )}
+
+                    {item.specialization && (
+                      <div className="flex items-center justify-center gap-1 mt-2">
+                        <Award className="w-3 h-3 text-amber-500" />
+                        <span className="text-xs text-slate-500">
+                          {item.specialization}
+                        </span>
+                      </div>
+                    )}
+
+                    {item.institution && (
+                      <div className="flex items-center justify-center gap-1 mt-1.5">
+                        <Building2 className="w-3 h-3 text-slate-400" />
+                        <span className="text-xs text-slate-500 truncate max-w-[180px]">
+                          {item.institution}
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="mt-3 inline-flex items-center gap-1 bg-brand-dark/5 text-brand-dark text-xs font-medium px-3 py-1 rounded-full">
+                      <GraduationCap className="w-3 h-3" />
+                      Angkatan {item.graduationYear}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-10">
+              <button
+                onClick={() => setPage(Math.max(1, page - 1))}
+                disabled={page === 1}
+                className="flex items-center gap-1 px-4 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Prev
+              </button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum: number;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (page <= 3) {
+                    pageNum = i + 1;
+                  } else if (page >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = page - 2 + i;
+                  }
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setPage(pageNum)}
+                      className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                        page === pageNum
+                          ? "bg-brand-dark text-white"
+                          : "text-slate-600 hover:bg-white"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={() => setPage(Math.min(totalPages, page + 1))}
+                disabled={page === totalPages}
+                className="flex items-center gap-1 px-4 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+      {/* Alumni Detail Modal */}
+      {selectedAlumni && (
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedAlumni(null)}
+        >
+          <div
+            className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="bg-gradient-to-br from-brand-dark to-brand-dark-hover px-6 pt-8 pb-16 relative">
+              <button
+                onClick={() => setSelectedAlumni(null)}
+                className="absolute top-4 right-4 p-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+              <div className="w-24 h-24 mx-auto rounded-full overflow-hidden bg-white/20 flex items-center justify-center border-4 border-white/30">
+                {selectedAlumni.photo ? (
+                  <img
+                    src={selectedAlumni.photo}
+                    alt={selectedAlumni.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-white text-3xl font-bold">
+                    {selectedAlumni.name[0]?.toUpperCase()}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="px-6 pb-6 -mt-8">
+              <div className="bg-white rounded-xl border border-slate-100 p-5 space-y-4">
+                <div className="text-center">
+                  <h2 className="text-xl font-bold text-slate-800">
+                    {selectedAlumni.name}
+                  </h2>
+                  {selectedAlumni.degree && (
+                    <p className="text-sm text-brand-dark font-medium mt-1">
+                      {selectedAlumni.degree}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  {selectedAlumni.specialization && (
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+                        <Award className="w-4 h-4 text-amber-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400">Spesialisasi</p>
+                        <p className="text-sm font-medium text-slate-700">
+                          {selectedAlumni.specialization}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedAlumni.institution && (
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                        <Building2 className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400">Instansi</p>
+                        <p className="text-sm font-medium text-slate-700">
+                          {selectedAlumni.institution}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedAlumni.email && (
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
+                        <Mail className="w-4 h-4 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400">Email</p>
+                        <p className="text-sm font-medium text-slate-700">
+                          {selectedAlumni.email}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedAlumni.contactNumber && (
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
+                        <Phone className="w-4 h-4 text-purple-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400">Kontak</p>
+                        <p className="text-sm font-medium text-slate-700">
+                          {selectedAlumni.contactNumber}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-brand-dark/5 flex items-center justify-center shrink-0">
+                      <GraduationCap className="w-4 h-4 text-brand-dark" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-400">Angkatan</p>
+                      <p className="text-sm font-medium text-slate-700">
+                        {selectedAlumni.graduationYear}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </Container>
+  );
+}

@@ -1,0 +1,16 @@
+/** @format */
+
+@import "tailwindcss";
+
+@theme {
+  --color-brand-dark: #135292;
+  --color-brand-steel: #42849E;
+  --color-brand-mint: #C6E5DD;
+  --color-brand-mint-green: #9BD4BA;
+  --color-brand-gray: #E6E9EE;
+  --color-brand-dark-hover: #0e3d6e;
+}
+
+body {
+  overflow-x: hidden;
+}
