@@ -3,6 +3,7 @@
 
 import Button from "./atomic/button";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { useSiteSettings } from "@/services/setting/hook";
 
 export default function AboutSection() {
@@ -10,7 +11,9 @@ export default function AboutSection() {
 
   const siteName = settings?.site_name || "IDOMAIN";
   const aboutTitle = settings?.about_title || `Tentang ${siteName}`;
-  const aboutDesc = settings?.about_description || "IDOMAIN adalah organisasi yang berdedikasi untuk memperkuat jejaring antar anggota, memfasilitasi kolaborasi lintas bidang, dan berkontribusi positif bagi masyarakat luas. Melalui berbagai program dan kegiatan, kami terus berupaya menciptakan dampak yang bermakna.";
+  const aboutDesc =
+    settings?.about_description ||
+    "IDOMAIN adalah organisasi yang berdedikasi untuk memperkuat jejaring antar anggota, memfasilitasi kolaborasi lintas bidang, dan berkontribusi positif bagi masyarakat luas. Melalui berbagai program dan kegiatan, kami terus berupaya menciptakan dampak yang bermakna.";
   const aboutImage = settings?.about_image;
 
   return (
@@ -20,7 +23,11 @@ export default function AboutSection() {
         <div className="flex items-center justify-center">
           {aboutImage ? (
             <div className="w-full max-w-[450px] aspect-square rounded-2xl overflow-hidden">
-              <img src={aboutImage} alt={aboutTitle} className="w-full h-full object-cover" />
+              <img
+                src={aboutImage}
+                alt={aboutTitle}
+                className="w-full h-full object-cover"
+              />
             </div>
           ) : (
             <div className="w-full max-w-[450px] aspect-square bg-gradient-to-br from-brand-dark to-brand-dark-hover rounded-2xl flex items-center justify-center">
@@ -32,18 +39,18 @@ export default function AboutSection() {
         {/* Text */}
         <div className="space-y-5">
           <h2 className="text-[28px] md:text-[40px] font-bold text-gray-900">
-            Tentang <span className="text-brand-dark">{siteName}</span>
+            Tentang <span className="text-brand-steel">{siteName}</span>
           </h2>
-          <p className="text-gray-600 leading-relaxed">
-            {aboutDesc}
-          </p>
-          <Button
-            label="Selengkapnya"
-            rounded
-            type="primary"
-            icon={<ArrowRight size={18} />}
-            onClick={() => (window.location.href = "/about")}
-          />
+          <p className="text-gray-600 leading-relaxed">{aboutDesc}</p>
+          <div className="text-xs">
+            <Link href="/about">
+              <Button
+                label="Selengkapnya"
+                type="default"
+                icon={<ArrowRight size={18} />}
+              />
+            </Link>
+          </div>
         </div>
       </div>
     </section>

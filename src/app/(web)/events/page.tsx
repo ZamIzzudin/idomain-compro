@@ -3,6 +3,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import Container from "@/components/atomic/container";
 import {
   CalendarDays,
@@ -24,6 +25,11 @@ export default function EventsPage() {
     undefined,
   );
 
+  const goToPage = (p: number) => {
+    setPage(p);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const { data, isLoading } = useEventList({
     page,
     limit: PER_PAGE,
@@ -32,6 +38,15 @@ export default function EventsPage() {
     upcoming: filterUpcoming,
     sortOrder: "asc",
   });
+
+  const { data: recentData } = useEventList({
+    page: 1,
+    limit: 3,
+    status: "PUBLISHED",
+    sortOrder: "desc",
+  });
+
+  const recentEvents = recentData?.items || [];
 
   const { data: filterOptions } = useEventFilterOptions();
 
@@ -43,8 +58,8 @@ export default function EventsPage() {
     if (!dateStr) return "";
     return new Date(dateStr).toLocaleDateString("en-GB", {
       day: "numeric",
-      month: "long",
-      year: "numeric",
+      month: "short",
+      year: "2-digit",
     });
   };
 
@@ -56,23 +71,22 @@ export default function EventsPage() {
     });
   };
 
+  console.log(data);
+
   return (
     <Container>
       {/* Hero */}
-      <section className="bg-brand-dark text-white py-20 px-[5%] md:px-[7%] lg:px-[10%] w-full">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="bg-brand-steel text-white py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
+        <div className="max-w-4xl mx-auto flex flex-col items-center">
           <h1 className="text-[32px] md:text-[48px] font-bold mb-4 flex items-center justify-center gap-3">
-            <CalendarDays className="w-10 h-10" />
-            Events & Agenda
+            Events & Programs
           </h1>
-          <p className="text-gray-300 text-base md:text-lg">
-            Jadwal kegiatan, acara, dan agenda mendatang
-          </p>
+          <div className="h-[3px] w-[100px] bg-brand-mint"></div>
         </div>
       </section>
 
       {/* Search & Filter */}
-      <section className="px-[5%] md:px-[7%] lg:px-[10%] pt-8 w-full bg-gray-50">
+      <section className="px-[5%] md:px-[7%] lg:px-[10%] py-8 w-full bg-gray-50">
         <div className="max-w-6xl mx-auto space-y-4">
           <div className="flex items-center gap-3">
             <div className="flex-1 relative">
@@ -83,7 +97,7 @@ export default function EventsPage() {
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
-                  setPage(1);
+                  goToPage(1);
                 }}
                 className="w-full pl-12 pr-10 py-3 bg-white border border-slate-200 rounded-xl text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-transparent"
               />
@@ -91,7 +105,7 @@ export default function EventsPage() {
                 <button
                   onClick={() => {
                     setSearch("");
-                    setPage(1);
+                    goToPage(1);
                   }}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
@@ -102,7 +116,7 @@ export default function EventsPage() {
             <button
               onClick={() => {
                 setFilterUpcoming(filterUpcoming ? undefined : "true");
-                setPage(1);
+                goToPage(1);
               }}
               className={`flex items-center gap-2 px-4 py-3 border rounded-xl text-sm font-medium transition-colors ${
                 filterUpcoming
@@ -114,171 +128,216 @@ export default function EventsPage() {
               <span className="hidden sm:inline">Upcoming</span>
             </button>
           </div>
-
-          <p className="text-sm text-slate-500">
-            Menampilkan {events.length} dari {total} event
-          </p>
         </div>
       </section>
 
-      {/* Events List */}
+      {/* Content + Aside */}
       <section className="px-[5%] md:px-[7%] lg:px-[10%] pb-16 w-full bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          {isLoading ? (
-            <div className="space-y-6">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-white rounded-xl overflow-hidden border border-slate-100 animate-pulse"
-                >
-                  <div className="flex flex-col md:flex-row">
-                    <div className="w-full md:w-64 h-48 md:h-auto bg-slate-200 shrink-0" />
-                    <div className="p-6 flex-1 space-y-3">
-                      <div className="h-4 bg-slate-200 rounded w-1/3" />
-                      <div className="h-6 bg-slate-200 rounded w-3/4" />
-                      <div className="h-3 bg-slate-200 rounded w-full" />
-                    </div>
-                  </div>
+        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
+          {/* Main content */}
+          <div className="flex-1 min-w-0">
+            {isLoading ? (
+              <div className="space-y-3">
+                <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 animate-pulse h-72" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="bg-white rounded-2xl overflow-hidden border border-slate-100 animate-pulse h-56"
+                    />
+                  ))}
                 </div>
-              ))}
-            </div>
-          ) : events.length === 0 ? (
-            <div className="text-center py-16">
-              <CalendarDays className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <p className="text-slate-500 text-lg">
-                Tidak ada event ditemukan
-              </p>
-              <p className="text-slate-400 text-sm mt-1">
-                Coba ubah kata kunci pencarian atau filter
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {events.map((event) => (
-                <article
-                  key={event.id}
-                  className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border border-slate-100"
-                >
-                  <div className="flex flex-col md:flex-row">
-                    {/* Date Badge / Image */}
-                    <div className="w-full md:w-64 h-48 md:h-auto shrink-0">
-                      {event.featuredImage ? (
-                        <img
-                          src={event.featuredImage}
-                          alt={event.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-brand-dark to-brand-dark-hover flex flex-col items-center justify-center text-white p-4">
-                          <span className="text-3xl font-bold">
-                            {new Date(event.eventDate).getDate()}
-                          </span>
-                          <span className="text-sm uppercase tracking-wider">
-                            {new Date(event.eventDate).toLocaleDateString(
-                              "en-GB",
-                              { month: "long", year: "numeric" },
-                            )}
-                          </span>
-                          <span className="text-xs text-white/60 mt-1">
-                            {formatTime(event.eventDate)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="p-6 flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        {event.tags?.length > 0 && (
-                          <span className="text-xs font-semibold text-brand-dark bg-brand-dark/10 px-3 py-1 rounded-full">
-                            {event.tags[0]}
-                          </span>
-                        )}
-                        <span className="flex items-center gap-1 text-xs text-gray-400">
-                          <CalendarDays size={12} />
-                          {formatDate(event.eventDate)}
-                          {event.endDate && ` - ${formatDate(event.endDate)}`}
-                        </span>
-                      </div>
-
-                      <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">
-                        {event.title}
-                      </h2>
-
-                      {event.location && (
-                        <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
-                          <MapPin size={14} className="text-slate-400" />
-                          {event.location}
-                        </div>
-                      )}
-
-                      {event.excerpt && (
-                        <p className="text-sm text-gray-500 mb-4">
-                          {event.excerpt}
-                        </p>
-                      )}
-
-                      <a
-                        href={`/events/${event.slug}`}
-                        className="inline-flex items-center gap-1 text-sm text-brand-dark font-semibold hover:gap-2 transition-all"
-                      >
-                        Detail Event
-                        <ArrowRight size={14} />
-                      </a>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-10">
-              <button
-                onClick={() => setPage(Math.max(1, page - 1))}
-                disabled={page === 1}
-                className="flex items-center gap-1 px-4 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Prev
-              </button>
-              <div className="flex items-center gap-1">
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  let pageNum: number;
-                  if (totalPages <= 5) {
-                    pageNum = i + 1;
-                  } else if (page <= 3) {
-                    pageNum = i + 1;
-                  } else if (page >= totalPages - 2) {
-                    pageNum = totalPages - 4 + i;
-                  } else {
-                    pageNum = page - 2 + i;
-                  }
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => setPage(pageNum)}
-                      className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
-                        page === pageNum
-                          ? "bg-brand-dark text-white"
-                          : "text-slate-600 hover:bg-white"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  );
-                })}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="bg-white rounded-2xl overflow-hidden border border-slate-100 animate-pulse h-64"
+                    />
+                  ))}
+                </div>
               </div>
-              <button
-                onClick={() => setPage(Math.min(totalPages, page + 1))}
-                disabled={page === totalPages}
-                className="flex items-center gap-1 px-4 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                Next
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          )}
+            ) : events.length === 0 ? (
+              <div className="text-center py-16">
+                <CalendarDays className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                <p className="text-slate-500 text-lg">
+                  Tidak ada event ditemukan
+                </p>
+                <p className="text-slate-400 text-sm mt-1">
+                  Coba ubah kata kunci pencarian atau filter
+                </p>
+              </div>
+            ) : (
+              (() => {
+                const pattern = [1, 3, 2];
+                const rows: { cols: number; items: typeof events }[] = [];
+                let idx = 0;
+
+                while (idx < events.length) {
+                  const rowLen = pattern[rows.length % pattern.length];
+                  const items = events.slice(idx, idx + rowLen);
+                  rows.push({ cols: rowLen, items });
+                  idx += rowLen;
+                }
+
+                return (
+                  <div className="space-y-3">
+                    {rows.map((row, ri) => {
+                      const isSingle = row.cols === 1;
+                      const gridClass =
+                        row.cols === 1
+                          ? "grid grid-cols-1"
+                          : row.cols === 2
+                            ? "grid grid-cols-1 md:grid-cols-2"
+                            : "grid grid-cols-1 md:grid-cols-3";
+
+                      return (
+                        <div key={ri} className={`${gridClass} gap-3`}>
+                          {row.items.map((event) => {
+                            const d = formatDate(event.eventDate);
+                            const day = d.split(" ")[0];
+                            const monthYear = d.split(" ").slice(1).join(" ");
+
+                            return (
+                              <Link
+                                key={event.id}
+                                href={`/events/${event.slug}`}
+                                className="overflow-hidden hover:bg-brand-steel group duration-300 block"
+                              >
+                                <div
+                                  className={`flex ${isSingle ? "flex-col md:flex-row" : ""} p-4`}
+                                >
+                                  <div
+                                    className={`flex items-start flex-col ${isSingle ? "px-3 md:px-5 md:justify-start md:min-w-[100px]" : "px-3"}`}
+                                  >
+                                    <span
+                                      className={`${isSingle ? "text-8xl" : "text-5xl"} text-brand-steel block group-hover:text-white font-bold leading-none pb-1 mb-1`}
+                                    >
+                                      {day}
+                                    </span>
+                                    <span
+                                      className={`group-hover:text-white text-brand-steel font-semibold ${isSingle ? "text-xl" : "text-sm"} text-center w-full`}
+                                    >
+                                      {monthYear}
+                                    </span>
+                                  </div>
+
+                                  <div
+                                    className={`flex-1 flex flex-col ${isSingle ? "" : "min-w-0"}`}
+                                  >
+                                    <div
+                                      className={`${isSingle ? "md:w-full h-56 md:h-72" : "h-40"} w-full shrink-0 overflow-hidden rounded-lg`}
+                                    >
+                                      {event.featuredImage ? (
+                                        <img
+                                          src={event.featuredImage}
+                                          alt={event.title}
+                                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                      ) : (
+                                        <div className="w-full h-full bg-gradient-to-br from-brand-dark to-brand-dark-hover flex flex-col items-center justify-center p-4">
+                                          <span className="text-3xl font-bold text-white/70">
+                                            {new Date(
+                                              event.eventDate,
+                                            ).getDate()}
+                                          </span>
+                                          <span className="text-sm uppercase tracking-wider text-white/50">
+                                            {new Date(
+                                              event.eventDate,
+                                            ).toLocaleDateString("en-GB", {
+                                              month: "long",
+                                              year: "numeric",
+                                            })}
+                                          </span>
+                                          <span className="text-xs text-white/40 mt-1">
+                                            {formatTime(event.eventDate)}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    <div className="pt-3 space-y-1">
+                                      {event.location && (
+                                        <div className="flex items-center gap-1 text-xs text-gray-500 group-hover:text-white">
+                                          <MapPin
+                                            size={14}
+                                            className="text-slate-400 group-hover:text-white"
+                                          />
+                                          {event.location}
+                                        </div>
+                                      )}
+                                      <h3
+                                        className={`${isSingle ? "text-xl" : "text-lg"} font-semibold text-brand-steel group-hover:text-white line-clamp-2`}
+                                      >
+                                        {event.title}
+                                      </h3>
+                                      {isSingle && event.excerpt && (
+                                        <p className="text-sm text-gray-500 group-hover:text-white/70 line-clamp-2">
+                                          {event.excerpt}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-10">
+                <button
+                  onClick={() => goToPage(Math.max(1, page - 1))}
+                  disabled={page === 1}
+                  className="flex items-center gap-1 px-4 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Prev
+                </button>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum: number;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (page <= 3) {
+                      pageNum = i + 1;
+                    } else if (page >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = page - 2 + i;
+                    }
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => goToPage(pageNum)}
+                        className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                          page === pageNum
+                            ? "bg-brand-steel text-white"
+                            : "text-slate-600 hover:bg-white"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+                <button
+                  onClick={() => goToPage(Math.min(totalPages, page + 1))}
+                  disabled={page === totalPages}
+                  className="flex items-center gap-1 px-4 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </section>
     </Container>

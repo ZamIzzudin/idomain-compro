@@ -58,7 +58,9 @@ export default function AlumniRegisterPage() {
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
-      const { data } = await AxiosClient.post("/upload/image", { image: base64 });
+      const { data } = await AxiosClient.post("/upload/image", {
+        image: base64,
+      });
       return data.data.url;
     } catch {
       return null;
@@ -107,7 +109,7 @@ export default function AlumniRegisterPage() {
           if (data.status === 201) {
             setSuccess(
               data.data?.message ||
-                "Registrasi berhasil! Akun Anda menunggu persetujuan admin."
+                "Registrasi berhasil! Akun Anda menunggu persetujuan admin.",
             );
             setForm({
               name: "",
@@ -128,35 +130,33 @@ export default function AlumniRegisterPage() {
         },
         onError: (error: any) => {
           setError(
-            error?.response?.data?.message || "Terjadi kesalahan. Silakan coba lagi."
+            error?.response?.data?.message ||
+              "Terjadi kesalahan. Silakan coba lagi.",
           );
         },
-      }
+      },
     );
   };
 
   return (
     <Container>
-      <section className="bg-brand-dark text-white py-16 px-[5%] md:px-[7%] lg:px-[10%] w-full">
-        <div className="max-w-2xl mx-auto text-center">
+      <section className="bg-brand-steel text-white py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
+        <div className="max-w-2xl mx-auto text-center flex flex-col items-center">
           <h1 className="text-[28px] md:text-[40px] font-bold mb-3 flex items-center justify-center gap-3">
-            <GraduationCap className="w-10 h-10" />
             Registrasi Alumni
           </h1>
-          <p className="text-gray-300 text-sm md:text-base">
-            Daftarkan diri Anda sebagai alumni IDOMAIN
-          </p>
+          <div className="h-[3px] w-[100px] bg-brand-mint"></div>
         </div>
       </section>
 
       <section className="px-[5%] md:px-[7%] lg:px-[10%] py-10 w-full bg-gray-50 min-h-[60vh]">
-        <div className="max-w-lg mx-auto">
+        <div className="max-w-2xl mx-auto">
           <Link
             href="/alumni"
-            className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-brand-dark mb-6 transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-brand-steel mb-6 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Kembali ke daftar alumni
+            Kembali
           </Link>
 
           {success && (
@@ -209,7 +209,9 @@ export default function AlumniRegisterPage() {
                 ) : (
                   <label className="w-20 h-20 border-2 border-dashed border-slate-200 rounded-full flex flex-col items-center justify-center cursor-pointer hover:border-brand-dark hover:bg-slate-50 transition-colors">
                     <Upload className="w-4 h-4 text-slate-300" />
-                    <span className="text-[9px] text-slate-400 mt-0.5">Upload</span>
+                    <span className="text-[9px] text-slate-400 mt-0.5">
+                      Upload
+                    </span>
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -220,7 +222,8 @@ export default function AlumniRegisterPage() {
                   </label>
                 )}
                 <p className="text-xs text-slate-400">
-                  Format: JPG, PNG, WebP<br />
+                  Format: JPG, PNG, WebP
+                  <br />
                   Maks: 5MB
                 </p>
               </div>
@@ -285,7 +288,9 @@ export default function AlumniRegisterPage() {
                 <input
                   type={showPassword ? "text" : "password"}
                   value={form.confirmPassword}
-                  onChange={(e) => updateField("confirmPassword", e.target.value)}
+                  onChange={(e) =>
+                    updateField("confirmPassword", e.target.value)
+                  }
                   placeholder="Ulangi password"
                   className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-transparent"
                 />
@@ -312,7 +317,9 @@ export default function AlumniRegisterPage() {
                 <input
                   type="number"
                   value={form.graduationYear}
-                  onChange={(e) => updateField("graduationYear", e.target.value)}
+                  onChange={(e) =>
+                    updateField("graduationYear", e.target.value)
+                  }
                   placeholder="2020"
                   min={1900}
                   max={2100}
@@ -360,7 +367,7 @@ export default function AlumniRegisterPage() {
               />
             </div>
 
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-700">
+            <div className="bg-brand-mint border border-brand-steel rounded-xl p-4 text-sm text-brand-steel">
               <p className="font-medium">Perhatian:</p>
               <p>
                 Anda dapat login segera setelah registrasi. Namun data Anda akan
@@ -371,7 +378,7 @@ export default function AlumniRegisterPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full py-3 bg-brand-dark text-white rounded-xl font-medium hover:bg-brand-dark-hover transition-colors disabled:opacity-50"
+              className="w-full py-3 bg-brand-steel text-white rounded-xl font-medium hover:bg-brand-steel/70 transition-colors disabled:opacity-50"
             >
               {isPending ? "Mendaftar..." : "Daftar Alumni"}
             </button>
@@ -380,7 +387,7 @@ export default function AlumniRegisterPage() {
               Sudah punya akun?{" "}
               <Link
                 href="/alumni/login"
-                className="text-brand-dark font-medium hover:underline"
+                className="text-brand-steel font-medium hover:underline"
               >
                 Login di sini
               </Link>

@@ -29,11 +29,20 @@ const socialIcons: Record<string, any> = {
   linkedin: Linkedin,
 };
 
+const sectionStyle = {
+  backgroundImage: "url(/bg-footer.png)",
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+};
+
 export default function Footer() {
   const { data: settings } = useSiteSettings();
 
   const siteName = settings?.site_name || "IDOMAIN";
-  const siteDesc = settings?.site_description || "Website resmi organisasi yang berkomitmen untuk memperkuat jejaring dan berkontribusi bagi masyarakat melalui berbagai kegiatan.";
+  const siteLogo = settings?.site_logo;
+  const siteDesc =
+    settings?.site_description ||
+    "Website resmi organisasi yang berkomitmen untuk memperkuat jejaring dan berkontribusi bagi masyarakat melalui berbagai kegiatan.";
   const phone = settings?.contact_phone || "";
   const email = settings?.contact_email || "";
   const address = settings?.contact_address || "";
@@ -46,15 +55,27 @@ export default function Footer() {
   ].filter((s) => s.href);
 
   return (
-    <footer className="bg-brand-dark text-white">
+    <footer className="bg-brand-dark text-white" style={sectionStyle}>
       <div className="px-[5%] md:px-[7%] lg:px-[10%] py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand */}
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold">{siteName}</h3>
-            <p className="text-gray-300 text-sm leading-relaxed">
-              {siteDesc}
-            </p>
+            {siteLogo ? (
+              <Link href="/">
+                <img
+                  src={siteLogo}
+                  alt={siteName}
+                  className="h-30 w-auto mb-5"
+                />
+              </Link>
+            ) : (
+              <>
+                <h3 className="text-2xl font-bold">{siteName}</h3>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  {siteDesc}
+                </p>
+              </>
+            )}
             {socialLinks.length > 0 && (
               <div className="flex gap-4">
                 {socialLinks.map((socmed) => {
@@ -145,9 +166,9 @@ export default function Footer() {
       </div>
 
       {/* Copyright */}
-      <div className="border-t border-white/10">
-        <div className="px-[5%] md:px-[7%] lg:px-[10%] py-5">
-          <p className="text-center text-gray-400 text-sm">
+      <div>
+        <div className="px-[5%] md:px-[7%] lg:px-[10%] py-2">
+          <p className="text-center text-xs text-brand-mint">
             &copy; {new Date().getFullYear()} {siteName} - All rights reserved
           </p>
         </div>

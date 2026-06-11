@@ -26,14 +26,14 @@ export default function ArticleDetailPage() {
   return (
     <Container>
       {/* Hero */}
-      <section className="bg-brand-dark text-white py-16 px-[5%] md:px-[7%] lg:px-[10%] w-full">
+      <section className="bg-brand-steel text-white py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
         <div className="max-w-4xl mx-auto">
           <a
             href="/news"
             className="inline-flex items-center gap-2 text-gray-300 hover:text-white text-sm mb-6 transition-colors"
           >
             <ArrowLeft size={16} />
-            Back to News
+            Kembali
           </a>
 
           {isLoading ? (

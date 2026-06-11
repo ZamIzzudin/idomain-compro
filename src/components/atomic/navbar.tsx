@@ -4,21 +4,28 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Menu, X, Phone, Mail, ChevronDown, User, LogOut } from "lucide-react";
+import { Menu, X, ChevronDown, User, LogOut, ArrowRight } from "lucide-react";
 import { useSiteSettings } from "@/services/setting/hook";
 import { useMyProfile } from "@/services/alumni/hook";
 
-const navLinks = [
+interface NavLink {
+  label: string;
+  href: string;
+  children?: { label: string; href: string }[];
+}
+
+const navLinks: NavLink[] = [
   { label: "Beranda", href: "/" },
   { label: "Tentang Kami", href: "/about" },
   { label: "Alumni", href: "/alumni" },
-  {
-    label: "News & Updates",
-    href: "/news",
-    children: [
-      { label: "Press Release", href: "/news?category=press-release" },
-    ],
-  },
+  { label: "News", href: "/news" },
+  // {
+  //   label: "News & Updates",
+  //   href: "/news",
+  //   children: [
+  //     { label: "Press Release", href: "/news?category=press-release" },
+  //   ],
+  // },
   { label: "Events", href: "/events" },
   { label: "Kontak", href: "/contact" },
 ];
@@ -39,8 +46,6 @@ export default function Navbar() {
   const { data: alumni } = useMyProfile();
 
   const siteName = settings?.site_name || "IDOMAIN";
-  const phone = settings?.contact_phone || "";
-  const email = settings?.contact_email || "";
 
   const handleLogout = () => {
     localStorage.removeItem("alumni_token");
@@ -76,48 +81,20 @@ export default function Navbar() {
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50">
-        {/* Top Contact Bar */}
-        {(phone || email) && (
-          <div
-            className={`bg-brand-dark text-white text-sm transition-all duration-300 ${
-              isScrolled ? "hidden" : "block"
-            }`}
-          >
-            <div className="flex justify-between items-center px-[5%] md:px-[5%] lg:px-[5%] py-2">
-              <div className="flex items-center gap-6">
-                {phone && (
-                  <a
-                    href={`tel:${phone}`}
-                    className="flex items-center gap-2 hover:text-gray-300 transition-colors"
-                  >
-                    <Phone size={14} />
-                    <span className="hidden sm:inline">{phone}</span>
-                  </a>
-                )}
-                {email && (
-                  <a
-                    href={`mailto:${email}`}
-                    className="flex items-center gap-2 hover:text-gray-300 transition-colors"
-                  >
-                    <Mail size={14} />
-                    <span className="hidden sm:inline">{email}</span>
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Main Navbar */}
         <div
           className={`flex justify-between items-center transition-all duration-300 ${
             isScrolled
-              ? "bg-white px-[3%] text-brand-dark"
-              : "bg-gradient-to-b from-black to-transparent px-[5%] md:px-[7%] lg:px-[10%] text-white"
+              ? "bg-white px-[3%] text-brand-steel"
+              : "px-[5%] md:px-[7%] lg:px-[10%] text-white"
           }`}
         >
           {/* Logo */}
-          <Link href="/" onClick={closeSidebar} className="py-3">
+          <Link
+            href="/"
+            onClick={closeSidebar}
+            className="py-3 text-brand-steel"
+          >
             {settings?.site_logo ? (
               <div className="flex items-center gap-3">
                 <img
@@ -152,7 +129,7 @@ export default function Navbar() {
                     onMouseLeave={() => setActiveDropdown(null)}
                   >
                     <button
-                      className={`relative flex items-center gap-1 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:bg-brand-steel after:transition-all after:duration-300 hover:after:w-full ${
+                      className={`relative flex items-center gap-1 after:content-[''] after:absolute after:-bottom-2 after:left-0 after:h-[2px] after:w-0 after:bg-brand-steel after:transition-all after:duration-300 hover:after:w-full ${
                         path === link.href ? "font-semibold" : ""
                       }`}
                     >
@@ -190,7 +167,7 @@ export default function Navbar() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className={`relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:bg-brand-steel after:transition-all after:duration-300 ${
+                  className={`relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:h-[2px] after:bg-brand-steel after:transition-all after:duration-300 ${
                     isActive
                       ? "font-semibold after:w-full"
                       : "after:w-0 hover:after:w-full"
@@ -265,9 +242,9 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/alumni/login"
-                className={`${isScrolled ? "text-white bg-brand-dark hover:bg-brand-steel px-5 py-3 " : "text-brand-mint"} text-sm rounded-lg font-medium transition-colors`}
+                className={`${isScrolled ? "text-white bg-brand-steel hover:bg-brand-steel/50" : "hover:bg-brand-mint hover:text-brand-dark"} text-sm rounded-lg font-medium transition-colors flex items-center gap-1 px-5 py-3`}
               >
-                Daftar Alumni
+                Daftar Alumni <ArrowRight className="h-5 w-5" />
               </Link>
             )}
           </div>
@@ -341,7 +318,7 @@ export default function Navbar() {
                 >
                   {link.label}
                 </Link>
-                {link.children && (
+                {link?.children && (
                   <div className="bg-gray-50">
                     {link.children.map((child) => (
                       <Link

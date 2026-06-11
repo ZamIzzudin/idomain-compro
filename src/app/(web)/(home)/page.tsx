@@ -16,9 +16,9 @@ export default function Home() {
       <Hero />
       <Container>
         <AboutSection />
+        <NewsSection />
         <TestimonialSection />
         <EventSection />
-        <NewsSection />
         <CTASection />
       </Container>
     </>

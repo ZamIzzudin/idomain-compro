@@ -19,12 +19,14 @@ export default function Button({
 }) {
   const bgColor = {
     primary: "bg-brand-dark",
+    secondary: "bg-brand-steel",
     default: "bg-white",
     disable: "bg-slate-300",
   };
 
   const textColor = {
     primary: "text-white",
+    secondary: "text-white",
     default: "text-brand-dark",
     disable: "text-slate-500",
   };

@@ -40,7 +40,8 @@ export default function AlumniLoginPage() {
       },
       onError: (error: any) => {
         const msg =
-          error?.response?.data?.message || "Terjadi kesalahan. Silakan coba lagi.";
+          error?.response?.data?.message ||
+          "Terjadi kesalahan. Silakan coba lagi.";
         setError(msg);
       },
     });
@@ -48,15 +49,12 @@ export default function AlumniLoginPage() {
 
   return (
     <Container>
-      <section className="bg-brand-dark text-white py-16 px-[5%] md:px-[7%] lg:px-[10%] w-full">
-        <div className="max-w-2xl mx-auto text-center">
+      <section className="bg-brand-steel text-white py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
+        <div className="max-w-2xl mx-auto text-center flex flex-col items-center">
           <h1 className="text-[28px] md:text-[40px] font-bold mb-3 flex items-center justify-center gap-3">
-            <GraduationCap className="w-10 h-10" />
             Login Alumni
           </h1>
-          <p className="text-gray-300 text-sm md:text-base">
-            Masuk ke akun alumni Anda
-          </p>
+          <div className="h-[3px] w-[100px] bg-brand-mint"></div>
         </div>
       </section>
 
@@ -64,10 +62,10 @@ export default function AlumniLoginPage() {
         <div className="max-w-md mx-auto">
           <Link
             href="/alumni"
-            className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-brand-dark mb-6 transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-brand-steel mb-6 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Kembali ke daftar alumni
+            Kembali
           </Link>
 
           {error && (
@@ -126,7 +124,7 @@ export default function AlumniLoginPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full py-3 bg-brand-dark text-white rounded-xl font-medium hover:bg-brand-dark-hover transition-colors disabled:opacity-50"
+              className="w-full py-3 bg-brand-steel text-white rounded-xl font-medium hover:bg-brand-steel/70 transition-colors disabled:opacity-50"
             >
               {isPending ? "Memproses..." : "Login"}
             </button>
@@ -135,7 +133,7 @@ export default function AlumniLoginPage() {
               Belum punya akun?{" "}
               <Link
                 href="/alumni/register"
-                className="text-brand-dark font-medium hover:underline"
+                className="text-brand-steel font-medium hover:underline"
               >
                 Daftar di sini
               </Link>

@@ -2,6 +2,7 @@
 "use client";
 
 import { CalendarDays, MapPin, ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { useEventList } from "@/services/event/hook";
 
 export default function EventSection() {
@@ -18,8 +19,8 @@ export default function EventSection() {
     if (!dateStr) return "";
     return new Date(dateStr).toLocaleDateString("en-GB", {
       day: "numeric",
-      month: "long",
-      year: "numeric",
+      month: "short",
+      year: "2-digit",
     });
   };
 
@@ -36,21 +37,12 @@ export default function EventSection() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
-          <div>
-            <h2 className="text-[28px] md:text-[40px] font-bold text-gray-900">
-              Events & Agenda
+          <div className="flex gap-3 w-full justify-center">
+            <div className="h-7 w-7 bg-brand-mint"></div>
+            <h2 className="text-[28px] md:text-[52px] font-bold text-brand-steel text-center">
+              Events & Programs
             </h2>
-            <p className="text-gray-500 mt-2">
-              Jadwal kegiatan dan acara mendatang
-            </p>
           </div>
-          <a
-            href="/events"
-            className="hidden md:flex items-center gap-2 text-brand-dark font-semibold hover:gap-3 transition-all"
-          >
-            Selengkapnya
-            <ArrowRight size={18} />
-          </a>
         </div>
 
         {/* Events List */}
@@ -78,94 +70,95 @@ export default function EventSection() {
             <p className="text-slate-500">Belum ada event</p>
           </div>
         ) : (
-          <div className="space-y-6">
-            {events.map((event) => (
-              <article
-                key={event.id}
-                className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border border-slate-100"
-              >
-                <div className="flex flex-col md:flex-row">
-                  {/* Image / Date Badge */}
-                  <div className="w-full md:w-48 h-40 md:h-auto shrink-0">
-                    {event.featuredImage ? (
-                      <img
-                        src={event.featuredImage}
-                        alt={event.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-brand-dark to-brand-dark-hover flex flex-col items-center justify-center text-white p-4">
-                        <span className="text-3xl font-bold">
-                          {new Date(event.eventDate).getDate()}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 cursor-pointer gap-3">
+            {events.map((event) => {
+              const dataEvent = formatDate(event.eventDate);
+              return (
+                <Link
+                  key={event.id}
+                  href={`/events/${event.slug}`}
+                  className="block"
+                >
+                <article
+                  className="overflow-hidden border-brand-steel/50 hover:bg-brand-steel group duration-300"
+                >
+                  <div className="flex flex-col p-4">
+                    <div className="flex gap-3">
+                      <div className="flex items-start flex-col px-3">
+                        <span className="flex items-center w-fit gap-1 text-5xl text-brand-steel block group-hover:text-white justify-left pb-1 mb-1 font-bold">
+                          {dataEvent.split(" ")[0]}
                         </span>
-                        <span className="text-sm uppercase tracking-wider">
-                          {new Date(event.eventDate).toLocaleDateString(
-                            "en-GB",
-                            { month: "long", year: "numeric" }
+                        <span className="group-hover:text-white flex items-center gap-1 text-xs text-brand-steel font-semibold">
+                          {dataEvent.split(" ")[1]} {dataEvent.split(" ")[2]}
+                        </span>
+                      </div>
+                      <div className="col-span-3 flex flex-col justify-center">
+                        <div className="w-full md:w-full h-40 md:h-auto shrink-0">
+                          {event.featuredImage ? (
+                            <img
+                              src={event.featuredImage}
+                              alt={event.title}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-brand-dark to-brand-dark-hover flex flex-col items-center justify-center text-brand-steel p-4">
+                              <span className="text-3xl font-bold">
+                                {new Date(event.eventDate).getDate()}
+                              </span>
+                              <span className="text-sm uppercase tracking-wider">
+                                {new Date(event.eventDate).toLocaleDateString(
+                                  "en-GB",
+                                  { month: "long", year: "numeric" },
+                                )}
+                              </span>
+                              <span className="text-xs text-brand-steel/60 mt-1">
+                                {formatTime(event.eventDate)}
+                              </span>
+                            </div>
                           )}
-                        </span>
-                        <span className="text-xs text-white/60 mt-1">
-                          {formatTime(event.eventDate)}
-                        </span>
+                        </div>
+                        <div className="pt-3 space-y-1">
+                          {event.location && (
+                            <div className="flex items-center gap-1 text-xs text-gray-500 group-hover:text-white">
+                              <MapPin
+                                size={14}
+                                className="text-slate-400 group-hover:text-white"
+                              />
+                              {event.location}
+                            </div>
+                          )}
+                          <h3 className="text-lg font-semibold text-brand-steel group-hover:text-white">
+                            {event.title}
+                          </h3>
+                        </div>
                       </div>
-                    )}
-                  </div>
-
-                  <div className="p-6 flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      {event.tags?.length > 0 && (
-                        <span className="text-xs font-semibold text-brand-dark bg-brand-dark/10 px-3 py-1 rounded-full">
-                          {event.tags[0]}
-                        </span>
-                      )}
-                      <span className="flex items-center gap-1 text-xs text-gray-400">
-                        <CalendarDays size={12} />
-                        {formatDate(event.eventDate)}
-                        {event.endDate &&
-                          ` - ${formatDate(event.endDate)}`}
-                      </span>
                     </div>
-
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {event.title}
-                    </h3>
-
-                    {event.location && (
-                      <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
-                        <MapPin size={14} className="text-slate-400" />
-                        {event.location}
-                      </div>
-                    )}
-
-                    {event.excerpt && (
-                      <p className="text-sm text-gray-500 line-clamp-2">
-                        {event.excerpt}
-                      </p>
-                    )}
-
-                    <a
-                      href={`/events/${event.slug}`}
-                      className="inline-flex items-center gap-1 text-sm text-brand-dark font-semibold mt-3 hover:gap-2 transition-all"
-                    >
-                      Detail Event
-                      <ArrowRight size={14} />
-                    </a>
                   </div>
-                </div>
-              </article>
-            ))}
+                </article>
+                </Link>
+              );
+            })}
           </div>
         )}
+        <div className="flex items-center justify-center py-5">
+          <Link
+            href="/events"
+            className="hidden md:flex items-center gap-2 text-brand-steel font-semibold hover:gap-3 transition-all"
+          >
+            Selengkapnya
+            <ArrowRight size={18} />
+          </Link>
+        </div>
 
         {/* Mobile: Selengkapnya */}
         <div className="mt-8 text-center md:hidden">
-          <a
+          <Link
             href="/events"
             className="inline-flex items-center gap-2 text-brand-dark font-semibold"
           >
             Selengkapnya
             <ArrowRight size={18} />
-          </a>
+          </Link>
         </div>
       </div>
     </section>

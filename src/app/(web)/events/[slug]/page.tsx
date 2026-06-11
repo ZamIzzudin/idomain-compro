@@ -35,14 +35,14 @@ export default function EventDetailPage() {
   return (
     <Container>
       {/* Hero */}
-      <section className="bg-brand-dark text-white py-16 px-[5%] md:px-[7%] lg:px-[10%] w-full">
+      <section className="bg-brand-steel text-white py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
         <div className="max-w-4xl mx-auto">
           <a
             href="/events"
             className="inline-flex items-center gap-2 text-gray-300 hover:text-white text-sm mb-6 transition-colors"
           >
             <ArrowLeft size={16} />
-            Back to Events
+            Kembali
           </a>
 
           {isLoading ? (
@@ -125,40 +125,6 @@ export default function EventDetailPage() {
                   ))}
                 </div>
               )}
-
-              {/* Event Info Card */}
-              <div className="bg-brand-dark/5 rounded-xl p-6 mb-8 border border-brand-dark/10">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex items-start gap-3">
-                    <CalendarDays className="w-3 h-3 text-brand-dark mt-0.5" />
-                    <div>
-                      <p className="text-xs text-slate-500 uppercase tracking-wider">
-                        Tanggal
-                      </p>
-                      <p className="text-sm font-medium text-slate-800">
-                        {formatDate(event.eventDate)}
-                      </p>
-                      <p className="text-sm text-slate-500">
-                        {formatTime(event.eventDate)}
-                        {event.endDate && ` - ${formatTime(event.endDate)}`}
-                      </p>
-                    </div>
-                  </div>
-                  {event.location && (
-                    <div className="flex items-start gap-3">
-                      <MapPin className="w-3 h-3 text-brand-dark mt-0.5" />
-                      <div>
-                        <p className="text-xs text-slate-500 uppercase tracking-wider">
-                          Lokasi
-                        </p>
-                        <p className="text-sm font-medium text-slate-800">
-                          {event.location}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
 
               <div
                 className="prose prose-slate max-w-none prose-headings:text-gray-900 prose-p:text-gray-600 prose-a:text-brand-dark"

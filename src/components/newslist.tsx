@@ -2,6 +2,7 @@
 "use client";
 
 import { Calendar, ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { useArticleList } from "@/services/article/hook";
 
 export default function NewsSection() {
@@ -29,20 +30,23 @@ export default function NewsSection() {
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
           <div>
-            <h2 className="text-[28px] md:text-[40px] font-bold text-gray-900">
-              News & Updates
-            </h2>
-            <p className="text-gray-500 mt-2">
+            <div className="flex gap-3">
+              <h2 className="text-[28px] md:text-[52px] font-bold text-brand-steel">
+                News & Updates
+              </h2>
+              <div className="h-5 w-5 bg-brand-mint"></div>
+            </div>
+            <p className="text-brand-steel mt-2">
               Berita dan informasi terbaru dari kami
             </p>
           </div>
-          <a
+          <Link
             href="/news"
-            className="hidden md:flex items-center gap-2 text-brand-dark font-semibold hover:gap-3 transition-all"
+            className="hidden md:flex items-center gap-2 text-brand-steel font-semibold hover:gap-3 transition-all"
           >
             Selengkapnya
             <ArrowRight size={18} />
-          </a>
+          </Link>
         </div>
 
         {/* News Grid */}
@@ -67,20 +71,27 @@ export default function NewsSection() {
             <p className="text-slate-500">Belum ada artikel</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 cursor-pointer">
             {articles.map((article) => (
-              <article
+              <Link
                 key={article.id}
-                className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow group"
+                href={`/news/${article.slug}`}
+                className="block"
+              >
+              <article
+                className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow group duration-300"
               >
                 {/* Image */}
-                <div className="w-full h-48">
+                <div className="w-full h-48 relative">
                   {article.featuredImage ? (
-                    <img
-                      src={article.featuredImage}
-                      alt={article.title}
-                      className="w-full h-full object-cover"
-                    />
+                    <>
+                      <img
+                        src={article.featuredImage}
+                        alt={article.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute top-0 z-10 bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 text-brand-steel bg-brand-mint/70 duration-300"></div>
+                    </>
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-brand-dark/80 to-brand-dark-hover/80 flex items-center justify-center">
                       <span className="text-white/50 text-sm">News Image</span>
@@ -88,49 +99,46 @@ export default function NewsSection() {
                   )}
                 </div>
 
-                <div className="p-6">
+                <div className="p-6 group-hover:bg-brand-steel duration-300">
                   <div className="flex items-center gap-3 mb-3">
-                    {article.tags?.length > 0 && (
-                      <span className="text-xs font-semibold text-brand-dark bg-brand-dark/10 px-3 py-1 rounded-full">
-                        {article.tags[0]}
-                      </span>
-                    )}
-                    <span className="flex items-center gap-1 text-xs text-gray-400">
+                    <span className="flex items-center gap-1 text-xs text-gray-400 group-hover:text-white">
                       <Calendar size={12} />
                       {formatDate(article.publishedAt || article.createdAt)}
                     </span>
                   </div>
 
-                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-brand-dark transition-colors">
+                  <div className=" space-x-2 my-3">
+                    {article.tags?.length > 0 &&
+                      article?.tags?.map((tag) => (
+                        <span key={tag} className="text-[10px] font-semibold text-brand-dark bg-brand-dark/10 group-hover:bg-brand-mint px-3 py-1 rounded-lg">
+                          {tag}
+                        </span>
+                      ))}
+                  </div>
+
+                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-white transition-colors">
                     {article.title}
                   </h3>
 
-                  <p className="text-sm text-gray-500 line-clamp-3">
+                  <p className="text-xs text-gray-500 group-hover:text-white line-clamp-3">
                     {article.excerpt || ""}
                   </p>
-
-                  <a
-                    href={`/news/${article.slug}`}
-                    className="inline-flex items-center gap-1 text-sm text-brand-dark font-semibold mt-4 hover:gap-2 transition-all"
-                  >
-                    Read more
-                    <ArrowRight size={14} />
-                  </a>
                 </div>
               </article>
+              </Link>
             ))}
           </div>
         )}
 
         {/* Mobile: Selengkapnya */}
         <div className="mt-8 text-center md:hidden">
-          <a
+          <Link
             href="/news"
             className="inline-flex items-center gap-2 text-brand-dark font-semibold"
           >
             Selengkapnya
             <ArrowRight size={18} />
-          </a>
+          </Link>
         </div>
       </div>
     </section>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Container from "@/components/atomic/container";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -15,7 +15,6 @@ import {
   Award,
   Phone,
   Mail,
-  Calendar,
   UserPlus,
   LogIn,
 } from "lucide-react";
@@ -57,34 +56,39 @@ export default function AlumniPage() {
     setPage(1);
   };
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem("alumni_token"));
+  }, []);
+
   return (
     <Container>
       {/* Hero */}
-      <section className="bg-brand-dark text-white py-20 px-[5%] md:px-[7%] lg:px-[10%] w-full">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-[32px] md:text-[48px] font-bold mb-4 flex items-center justify-center gap-3">
-            <GraduationCap className="w-10 h-10" />
+      <section className="bg-brand-steel text-white py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
+        <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
+          <h1 className="text-[32px] md:text-[48px] font-bold flex items-center justify-center gap-3">
             Alumni
           </h1>
-          <p className="text-gray-300 text-base md:text-lg mb-6">
-            Temukan dan terhubung dengan sesama alumni dokter
-          </p>
-          <div className="flex items-center justify-center gap-3">
-            <Link
-              href="/alumni/register"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-brand-dark rounded-xl font-medium text-sm hover:bg-gray-100 transition-colors"
-            >
-              <UserPlus className="w-4 h-4" />
-              Daftar Alumni
-            </Link>
-            <Link
-              href="/alumni/login"
-              className="inline-flex items-center gap-2 px-5 py-2.5 border border-white/30 text-white rounded-xl font-medium text-sm hover:bg-white/10 transition-colors"
-            >
-              <LogIn className="w-4 h-4" />
-              Login
-            </Link>
-          </div>
+          <div className="h-[3px] w-[100px] bg-brand-mint mb-6"></div>
+          {!isLoggedIn && (
+            <div className="flex items-center justify-center gap-3">
+              <Link
+                href="/alumni/register"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-brand-steel rounded-xl font-medium text-sm hover:bg-gray-100 transition-colors"
+              >
+                <UserPlus className="w-4 h-4" />
+                Daftar Alumni
+              </Link>
+              <Link
+                href="/alumni/login"
+                className="inline-flex items-center gap-2 px-5 py-2.5 border border-white/30 text-white rounded-xl font-medium text-sm hover:bg-white/10 transition-colors"
+              >
+                <LogIn className="w-4 h-4" />
+                Login
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
@@ -193,10 +197,6 @@ export default function AlumniPage() {
               )}
             </div>
           )}
-
-          <p className="text-sm text-slate-500">
-            Menampilkan {alumni.length} dari {total} alumni
-          </p>
         </div>
       </section>
 
@@ -276,7 +276,7 @@ export default function AlumniPage() {
                       </div>
                     )}
 
-                    <div className="mt-3 inline-flex items-center gap-1 bg-brand-dark/5 text-brand-dark text-xs font-medium px-3 py-1 rounded-full">
+                    <div className="mt-3 inline-flex items-center gap-1 bg-brand-dark/5 text-brand-steel text-xs font-medium px-3 py-1 rounded-full">
                       <GraduationCap className="w-3 h-3" />
                       Angkatan {item.graduationYear}
                     </div>
@@ -345,52 +345,62 @@ export default function AlumniPage() {
           onClick={() => setSelectedAlumni(null)}
         >
           <div
-            className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden"
+            className="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex relative"
             onClick={(e) => e.stopPropagation()}
           >
+            <button
+              onClick={() => setSelectedAlumni(null)}
+              className="absolute top-4 right-4 p-1.5 bg-brand-steel/50 rounded-lg hover:bg-brand-steel/70 transition-colors"
+            >
+              <X className="w-4 h-4 text-white" />
+            </button>
             {/* Header */}
-            <div className="bg-gradient-to-br from-brand-dark to-brand-dark-hover px-6 pt-8 pb-16 relative">
-              <button
-                onClick={() => setSelectedAlumni(null)}
-                className="absolute top-4 right-4 p-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
-              >
-                <X className="w-4 h-4 text-white" />
-              </button>
-              <div className="w-24 h-24 mx-auto rounded-full overflow-hidden bg-white/20 flex items-center justify-center border-4 border-white/30">
+            <div className="px-6 py-8  flex">
+              <div className="flex flex-col items-center justify-start w-full ">
                 {selectedAlumni.photo ? (
                   <img
                     src={selectedAlumni.photo}
                     alt={selectedAlumni.name}
-                    className="w-full h-full object-cover"
+                    className="object-cover w-24 h-24 rounded-2xl border-2 border-white/30"
                   />
                 ) : (
                   <span className="text-white text-3xl font-bold">
                     {selectedAlumni.name[0]?.toUpperCase()}
                   </span>
                 )}
+                <div className="mt-3 inline-flex items-center gap-1 bg-brand-dark/5 text-brand-steel text-xs font-medium px-3 py-1 rounded-full">
+                  <GraduationCap className="w-3 h-3" />
+                  Angkatan {selectedAlumni.graduationYear}
+                </div>
               </div>
             </div>
+            <div className="border border-slate-100 p-5 space-y-4 flex-1 flex w-full">
+              <div className="space-y-3 w-full flex flex-col justify-evenly">
+                <div className="grid grid-cols-2">
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <p className="text-xs text-slate-400">Nama Lengkap</p>
+                      <p className="text-sm font-medium text-slate-700">
+                        {selectedAlumni.name}
+                      </p>
+                    </div>
+                  </div>
 
-            {/* Content */}
-            <div className="px-6 pb-6 -mt-8">
-              <div className="bg-white rounded-xl border border-slate-100 p-5 space-y-4">
-                <div className="text-center">
-                  <h2 className="text-xl font-bold text-slate-800">
-                    {selectedAlumni.name}
-                  </h2>
                   {selectedAlumni.degree && (
-                    <p className="text-sm text-brand-dark font-medium mt-1">
-                      {selectedAlumni.degree}
-                    </p>
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <p className="text-xs text-slate-400">Gelar</p>
+                        <p className="text-sm font-medium text-slate-700">
+                          {selectedAlumni.degree}
+                        </p>
+                      </div>
+                    </div>
                   )}
                 </div>
 
-                <div className="space-y-3">
+                <div className="grid grid-cols-2">
                   {selectedAlumni.specialization && (
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-                        <Award className="w-4 h-4 text-amber-600" />
-                      </div>
                       <div>
                         <p className="text-xs text-slate-400">Spesialisasi</p>
                         <p className="text-sm font-medium text-slate-700">
@@ -402,9 +412,6 @@ export default function AlumniPage() {
 
                   {selectedAlumni.institution && (
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                        <Building2 className="w-4 h-4 text-blue-600" />
-                      </div>
                       <div>
                         <p className="text-xs text-slate-400">Instansi</p>
                         <p className="text-sm font-medium text-slate-700">
@@ -413,12 +420,11 @@ export default function AlumniPage() {
                       </div>
                     </div>
                   )}
+                </div>
 
+                <div className="grid grid-cols-2">
                   {selectedAlumni.email && (
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
-                        <Mail className="w-4 h-4 text-green-600" />
-                      </div>
                       <div>
                         <p className="text-xs text-slate-400">Email</p>
                         <p className="text-sm font-medium text-slate-700">
@@ -430,9 +436,6 @@ export default function AlumniPage() {
 
                   {selectedAlumni.contactNumber && (
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
-                        <Phone className="w-4 h-4 text-purple-600" />
-                      </div>
                       <div>
                         <p className="text-xs text-slate-400">Kontak</p>
                         <p className="text-sm font-medium text-slate-700">
@@ -441,18 +444,6 @@ export default function AlumniPage() {
                       </div>
                     </div>
                   )}
-
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-brand-dark/5 flex items-center justify-center shrink-0">
-                      <GraduationCap className="w-4 h-4 text-brand-dark" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-400">Angkatan</p>
-                      <p className="text-sm font-medium text-slate-700">
-                        {selectedAlumni.graduationYear}
-                      </p>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
