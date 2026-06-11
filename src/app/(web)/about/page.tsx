@@ -53,7 +53,7 @@ export default function AboutPage() {
               </div>
             )}
             <div className="space-y-5">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+              <h2 className="text-2xl md:text-3xl font-bold text-brand-steel">
                 Sejarah & Visi
               </h2>
               <p className="text-gray-600 leading-relaxed">{aboutDesc}</p>
@@ -69,9 +69,13 @@ export default function AboutPage() {
           </div>
 
           <div className="bg-gray-50 rounded-2xl p-8 md:p-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
-              Misi Kami
-            </h2>
+            <div className="flex gap-3">
+              <div className="h-3 w-3 bg-brand-mint"></div>
+              <h2 className="text-2xl md:text-3xl font-bold text-brand-steel mb-6">
+                Misi Kami
+              </h2>
+            </div>
+
             <div
               className={`grid grid-cols-1 ${misiItems.length >= 3 ? "md:grid-cols-3" : "md:grid-cols-2"} gap-6`}
             >
