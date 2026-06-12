@@ -121,7 +121,7 @@ export default function ArticleDetailPage() {
                 className="inline-flex items-center gap-2 text-brand-dark font-semibold mt-4"
               >
                 <ArrowLeft size={16} />
-                Kembali ke News
+                Kembali
               </a>
             </div>
           )}

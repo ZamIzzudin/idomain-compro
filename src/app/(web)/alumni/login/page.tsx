@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import Container from "@/components/atomic/container";
 import { GraduationCap, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useLoginAlumni } from "@/services/alumni/hook";
@@ -11,7 +12,6 @@ export default function AlumniLoginPage() {
   const router = useRouter();
   const { mutate: login, isPending } = useLoginAlumni();
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
 
   const [form, setForm] = useState({
     email: "",
@@ -20,10 +20,9 @@ export default function AlumniLoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
     if (!form.email || !form.password) {
-      setError("Email dan password wajib diisi");
+      toast.error("Email dan password wajib diisi");
       return;
     }
 
@@ -33,16 +32,17 @@ export default function AlumniLoginPage() {
           if (typeof window !== "undefined" && data.data?.access_token) {
             localStorage.setItem("alumni_token", data.data.access_token);
           }
+          toast.success("Login berhasil!");
           router.push("/alumni/profile");
         } else {
-          setError(data.message || "Login gagal");
+          toast.error(data.message || "Login gagal");
         }
       },
       onError: (error: any) => {
         const msg =
           error?.response?.data?.message ||
           "Terjadi kesalahan. Silakan coba lagi.";
-        setError(msg);
+        toast.error(msg);
       },
     });
   };
@@ -67,12 +67,6 @@ export default function AlumniLoginPage() {
             <ArrowLeft className="w-4 h-4" />
             Kembali
           </Link>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 mb-6 text-sm">
-              {error}
-            </div>
-          )}
 
           <form
             onSubmit={handleSubmit}

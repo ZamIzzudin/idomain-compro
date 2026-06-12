@@ -7,6 +7,13 @@ import {
   loginAlumni,
   fetchMyProfile,
   updateMyProfile,
+  fetchMyWorkHistories,
+  createWorkHistory,
+  updateWorkHistory,
+  deleteWorkHistory,
+  fetchAlumniStats,
+  lookupAlumni,
+  claimAlumni,
 } from "./service";
 
 export const useAlumniList = (params: {
@@ -15,6 +22,7 @@ export const useAlumniList = (params: {
   q?: string;
   graduationYear?: number;
   specialization?: string;
+  province?: string;
   sort?: string;
 }) => {
   return useQuery({
@@ -72,5 +80,75 @@ export const useUpdateMyProfile = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["alumni_me"] });
     },
+  });
+};
+
+export const useMyWorkHistories = () => {
+  return useQuery({
+    queryKey: ["my_work_histories"],
+    queryFn: fetchMyWorkHistories,
+    enabled: typeof window !== "undefined" && !!localStorage.getItem("alumni_token"),
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useCreateWorkHistory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["create_work_history"],
+    mutationFn: createWorkHistory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my_work_histories"] });
+      queryClient.invalidateQueries({ queryKey: ["alumni_me"] });
+    },
+  });
+};
+
+export const useUpdateWorkHistory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["update_work_history"],
+    mutationFn: ({ id, ...payload }: { id: number; [key: string]: any }) =>
+      updateWorkHistory(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my_work_histories"] });
+      queryClient.invalidateQueries({ queryKey: ["alumni_me"] });
+    },
+  });
+};
+
+export const useDeleteWorkHistory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["delete_work_history"],
+    mutationFn: deleteWorkHistory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my_work_histories"] });
+      queryClient.invalidateQueries({ queryKey: ["alumni_me"] });
+    },
+  });
+};
+
+export const useAlumniStats = () => {
+  return useQuery({
+    queryKey: ["alumni_stats"],
+    queryFn: fetchAlumniStats,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useLookupAlumni = () => {
+  return useMutation({
+    mutationKey: ["lookup_alumni"],
+    mutationFn: ({ name, batch }: { name: string; batch: number }) =>
+      lookupAlumni(name, batch),
+  });
+};
+
+export const useClaimAlumni = () => {
+  return useMutation({
+    mutationKey: ["claim_alumni"],
+    mutationFn: ({ id, ...payload }: { id: number } & Parameters<typeof claimAlumni>[1]) =>
+      claimAlumni(id, payload),
   });
 };

@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useQueryClient } from "@tanstack/react-query";
 import { Menu, X, ChevronDown, User, LogOut, ArrowRight } from "lucide-react";
 import { useSiteSettings } from "@/services/setting/hook";
 import { useMyProfile } from "@/services/alumni/hook";
@@ -32,24 +33,22 @@ const navLinks: NavLink[] = [
 
 export default function Navbar() {
   const path = usePathname();
+  const queryClient = useQueryClient();
   const { data: settings } = useSiteSettings();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [profileDropdown, setProfileDropdown] = useState(false);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  useEffect(() => {
-    setIsLoggedIn(!!localStorage.getItem("alumni_token"));
-  }, []);
-
   const { data: alumni } = useMyProfile();
+  const isLoggedIn = !!alumni;
 
   const siteName = settings?.site_name || "IDOMAIN";
 
   const handleLogout = () => {
     localStorage.removeItem("alumni_token");
-    setIsLoggedIn(false);
+    queryClient.removeQueries({ queryKey: ["alumni_me"] });
+    queryClient.removeQueries({ queryKey: ["my_work_histories"] });
     setProfileDropdown(false);
     window.location.href = "/";
   };
@@ -111,7 +110,9 @@ export default function Navbar() {
                 </span>
               </div>
             ) : (
-              <span className="text-xl md:text-2xl font-bold tracking-wide">
+              <span
+                className={`text-xl ${isScrolled ? "text-brand-steel" : "text-white"}  md:text-2xl font-bold tracking-wide`}
+              >
                 {siteName}
               </span>
             )}
@@ -225,7 +226,7 @@ export default function Navbar() {
                   </div>
                   <Link
                     href="/alumni/profile"
-                    className="flex items-center gap-2 px-4 py-3 text-gray-800 hover:bg-brand-dark hover:text-white transition-colors text-sm"
+                    className="flex items-center gap-2 px-4 py-3 text-gray-800 hover:bg-brand-mint hover:text-brand-steel transition-colors text-sm"
                   >
                     <User className="w-4 h-4" />
                     Profil Saya

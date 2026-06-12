@@ -1,16 +1,32 @@
 import AxiosClient from "@/lib/axios";
 
+export interface WorkHistoryItem {
+  id: number;
+  alumniId: number;
+  institutionName: string;
+  startYear: number;
+  endYear: number | null;
+  province: string | null;
+  city: string | null;
+}
+
 export interface AlumniItem {
   id: number;
   name: string;
   email: string | null;
   contactNumber: string | null;
   graduationYear: number;
-  degree: string | null;
+  batch: number | null;
+  degreePrefix: string | null;
+  degreeSuffix: string | null;
   specialization: string | null;
-  institution: string | null;
+  province: string | null;
+  city: string | null;
   photo: string | null;
   isApproved: boolean;
+  emailVisible?: boolean;
+  contactNumberVisible?: boolean;
+  workHistories: WorkHistoryItem[];
 }
 
 export interface AlumniListResponse {
@@ -37,6 +53,7 @@ export async function fetchAlumniList(params: {
   q?: string;
   graduationYear?: number;
   specialization?: string;
+  province?: string;
   sort?: string;
 }) {
   const { data } = await AxiosClient.get("/alumni", { params });
@@ -48,6 +65,7 @@ export async function fetchAlumniFilterOptions() {
   return data.data as {
     years: number[];
     specializations: string[];
+    provinces: string[];
   };
 }
 
@@ -62,9 +80,12 @@ export async function registerAlumni(payload: {
   password: string;
   contactNumber?: string | null;
   graduationYear: number;
-  degree?: string | null;
+  batch?: number | null;
+  degreePrefix?: string | null;
+  degreeSuffix?: string | null;
   specialization?: string | null;
-  institution?: string | null;
+  province?: string | null;
+  city?: string | null;
   photo?: string | null;
 }) {
   const { data } = await AxiosClient.post("/alumni/register", payload);
@@ -89,13 +110,102 @@ export async function updateMyProfile(payload: {
   email?: string | null;
   contactNumber?: string | null;
   graduationYear?: number;
-  degree?: string | null;
+  batch?: number | null;
+  degreePrefix?: string | null;
+  degreeSuffix?: string | null;
   specialization?: string | null;
-  institution?: string | null;
+  province?: string | null;
+  city?: string | null;
   password?: string;
   photo?: string | null;
   removePhoto?: boolean;
 }) {
   const { data } = await AxiosClient.put("/alumni/me", payload);
   return data.data as AlumniItem;
+}
+
+// Work History API calls
+export async function fetchMyWorkHistories() {
+  const { data } = await AxiosClient.get("/alumni/me/work-histories");
+  return data.data as WorkHistoryItem[];
+}
+
+export async function createWorkHistory(payload: {
+  institutionName: string;
+  startYear: number;
+  endYear?: number | null;
+  province?: string | null;
+  city?: string | null;
+}) {
+  const { data } = await AxiosClient.post("/alumni/me/work-histories", payload);
+  return data.data as WorkHistoryItem;
+}
+
+export async function updateWorkHistory(
+  id: number,
+  payload: {
+    institutionName?: string;
+    startYear?: number;
+    endYear?: number | null;
+    province?: string | null;
+    city?: string | null;
+  }
+) {
+  const { data } = await AxiosClient.put(`/alumni/me/work-histories/${id}`, payload);
+  return data.data as WorkHistoryItem;
+}
+
+export async function deleteWorkHistory(id: number) {
+  const { data } = await AxiosClient.delete(`/alumni/me/work-histories/${id}`);
+  return data;
+}
+
+export interface AlumniStats {
+  total: number;
+  byProvince: Array<{ province: string; count: number }>;
+  byYear: Array<{ year: number; count: number }>;
+  byBatch: Array<{ batch: number; count: number }>;
+  bySpecialization: Array<{ specialization: string; count: number }>;
+}
+
+export async function fetchAlumniStats() {
+  const { data } = await AxiosClient.get("/alumni/stats");
+  return data.data as AlumniStats;
+}
+
+export interface AlumniLookupItem {
+  id: number;
+  name: string;
+  graduationYear: number;
+  batch: number | null;
+  degreePrefix: string | null;
+  degreeSuffix: string | null;
+  specialization: string | null;
+  province: string | null;
+  city: string | null;
+  contactNumber: string | null;
+  photo: string | null;
+}
+
+export async function lookupAlumni(name: string, batch: number) {
+  const { data } = await AxiosClient.get("/alumni/lookup", {
+    params: { name, batch },
+  });
+  return data.data as AlumniLookupItem[];
+}
+
+export async function claimAlumni(id: number, payload: {
+  email: string;
+  password: string;
+  contactNumber?: string | null;
+  batch?: number | null;
+  degreePrefix?: string | null;
+  degreeSuffix?: string | null;
+  specialization?: string | null;
+  province?: string | null;
+  city?: string | null;
+  photo?: string | null;
+}) {
+  const { data } = await AxiosClient.post(`/alumni/claim/${id}`, payload);
+  return data;
 }

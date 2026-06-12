@@ -17,13 +17,35 @@ export default function AboutPage() {
   const aboutMisi = settings?.about_misi || "";
   const aboutImage = settings?.about_image;
 
-  const misiItems = aboutMisi
-    ? aboutMisi.split("\n").filter(Boolean)
-    : [
-        "Memperkuat Jejaring — Membangun jaringan yang kuat antar anggota dan mitra.",
-        "Kolaborasi — Memfasilitasi kerjasama lintas bidang untuk dampak yang lebih besar.",
-        "Kontribusi — Berperan aktif dalam kegiatan sosial dan pembangunan masyarakat.",
-      ];
+  let misiItems: Array<{ title: string; subtitle: string }> = [];
+  if (aboutMisi) {
+    try {
+      const parsed = JSON.parse(aboutMisi);
+      if (Array.isArray(parsed)) {
+        misiItems = parsed;
+      }
+    } catch {
+      // Legacy format: plain text with newlines, parse with " — " separator
+      misiItems = aboutMisi
+        .split("\n")
+        .filter(Boolean)
+        .map((line: string) => {
+          const parts = line.split(" — ");
+          return {
+            title: parts[0]?.trim() || "",
+            subtitle: parts[1]?.trim() || line.trim(),
+          };
+        });
+    }
+  }
+
+  if (misiItems.length === 0) {
+    misiItems = [
+      { title: "Memperkuat Jejaring", subtitle: "Membangun jaringan yang kuat antar anggota dan mitra." },
+      { title: "Kolaborasi", subtitle: "Memfasilitasi kerjasama lintas bidang untuk dampak yang lebih besar." },
+      { title: "Kontribusi", subtitle: "Berperan aktif dalam kegiatan sosial dan pembangunan masyarakat." },
+    ];
+  }
 
   return (
     <Container>
@@ -79,19 +101,17 @@ export default function AboutPage() {
             <div
               className={`grid grid-cols-1 ${misiItems.length >= 3 ? "md:grid-cols-3" : "md:grid-cols-2"} gap-6`}
             >
-              {misiItems.map((item, i) => {
-                const parts = item.split(" — ");
-                return (
+              {misiItems.map((item, i) => (
                   <div key={i} className="bg-white p-6 rounded-xl shadow-sm">
                     <h3 className="font-semibold text-brand-dark mb-2">
-                      {parts[0]?.trim() || `Misi ${i + 1}`}
+                      {item.title || `Misi ${i + 1}`}
                     </h3>
                     <p className="text-sm text-gray-600">
-                      {parts[1]?.trim() || item}
+                      {item.subtitle}
                     </p>
                   </div>
-                );
-              })}
+                ),
+              )}
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import Container from "@/components/atomic/container";
 import { useDebounce } from "@/hooks/useDebounce";
 import {
@@ -11,15 +12,32 @@ import {
   ChevronRight,
   Filter,
   GraduationCap,
-  Building2,
   Award,
-  Phone,
-  Mail,
+  MapPin,
   UserPlus,
   LogIn,
+  Briefcase,
+  Users,
+  BarChart3,
 } from "lucide-react";
-import { useAlumniList, useAlumniFilterOptions } from "@/services/alumni/hook";
+import {
+  useAlumniList,
+  useAlumniFilterOptions,
+  useAlumniStats,
+} from "@/services/alumni/hook";
 import type { AlumniItem } from "@/services/alumni/service";
+
+const IndonesiaAlumniMap = dynamic(
+  () => import("@/components/IndonesiaAlumniMap"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[300px] bg-slate-100 rounded-2xl animate-pulse flex items-center justify-center">
+        <p className="text-slate-400 text-sm">Memuat peta...</p>
+      </div>
+    ),
+  },
+);
 
 const PER_PAGE = 12;
 
@@ -31,6 +49,9 @@ export default function AlumniPage() {
   const [sort, setSort] = useState("newest");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedAlumni, setSelectedAlumni] = useState<AlumniItem | null>(null);
+  const [filterProvince, setFilterProvince] = useState<string | undefined>(
+    undefined,
+  );
 
   const debouncedSearch = useDebounce(search);
 
@@ -40,10 +61,12 @@ export default function AlumniPage() {
     q: debouncedSearch || undefined,
     graduationYear: filterYear,
     specialization: filterSpec,
+    province: filterProvince,
     sort,
   });
 
   const { data: filterOptions } = useAlumniFilterOptions();
+  const { data: stats } = useAlumniStats();
 
   const alumni = data?.items || [];
   const totalPages = data?.totalPages || 1;
@@ -52,6 +75,7 @@ export default function AlumniPage() {
   const resetFilters = () => {
     setFilterYear(undefined);
     setFilterSpec(undefined);
+    setFilterProvince(undefined);
     setSort("newest");
     setPage(1);
   };
@@ -61,6 +85,21 @@ export default function AlumniPage() {
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem("alumni_token"));
   }, []);
+
+  const formatDegree = (item: AlumniItem) => {
+    const parts: string[] = [];
+    if (item.degreePrefix) parts.push(item.degreePrefix);
+    if (item.degreeSuffix) parts.push(item.degreeSuffix);
+    return parts.join(", ");
+  };
+
+  const formatWorkPeriod = (wh: {
+    startYear: number;
+    endYear: number | null;
+  }) => {
+    if (wh.endYear) return `${wh.startYear} - ${wh.endYear}`;
+    return `${wh.startYear} - Sekarang`;
+  };
 
   return (
     <Container>
@@ -92,6 +131,194 @@ export default function AlumniPage() {
         </div>
       </section>
 
+      {/* Stats & Map Section */}
+      {stats && (
+        <section className="px-[5%] md:px-[7%] lg:px-[10%] py-10 w-full bg-white">
+          <div className="max-w-6xl mx-auto">
+            <div className="gap-5 flex flex-col">
+              {/* Map */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <MapPin className="w-5 h-5 text-brand-steel" />
+                  <h2 className="text-lg font-bold text-slate-800">
+                    Sebaran Alumni
+                  </h2>
+                </div>
+                <div>
+                  <IndonesiaAlumniMap
+                    data={stats.byProvince}
+                    selectedProvince={filterProvince}
+                    onProvinceClick={(province) => {
+                      setFilterProvince(province || undefined);
+                      setPage(1);
+                      if (province) {
+                        document
+                          .getElementById("alumni-list")
+                          ?.scrollIntoView({ behavior: "smooth" });
+                      }
+                    }}
+                  />
+                  {filterProvince && (
+                    <div className="flex items-center justify-center gap-2 mt-3 text-sm">
+                      <span className="text-slate-500">Filter:</span>
+                      <span className="font-medium text-brand-steel">
+                        {filterProvince}
+                      </span>
+                      <button
+                        onClick={() => {
+                          setFilterProvince(undefined);
+                          setPage(1);
+                        }}
+                        className="p-0.5 rounded-full bg-slate-200 hover:bg-slate-300 transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5 text-slate-600" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Stats Cards */}
+              <div className="space-y-4 grid grid-cols-4 gap-3">
+                {/* Total Alumni */}
+                <div className="bg-brand-steel rounded-2xl p-5 text-white">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Users className="w-5 h-5 opacity-80" />
+                    <span className="text-sm font-medium opacity-80">
+                      Total Alumni
+                    </span>
+                  </div>
+                  <p className="text-3xl font-bold">{stats.total}</p>
+                </div>
+
+                {/* Top Provinces */}
+                <div className="bg-white rounded-2xl p-5 border border-slate-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <MapPin className="w-4 h-4 text-brand-dark" />
+                    <h3 className="text-sm font-semibold text-slate-800">
+                      Provinsi Terbanyak
+                    </h3>
+                  </div>
+                  <div className="space-y-2">
+                    {stats.byProvince.slice(0, 3).map((item, idx) => (
+                      <div
+                        key={item.province}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-slate-400 w-4">
+                            {idx + 1}.
+                          </span>
+                          <span className="text-sm text-slate-700 truncate max-w-[140px]">
+                            {item.province}
+                          </span>
+                        </div>
+                        <span className="text-sm font-semibold text-brand-dark">
+                          {item.count}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Top Specializations */}
+                <div className="bg-white rounded-2xl p-5 border border-slate-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Award className="w-4 h-4 text-amber-500" />
+                    <h3 className="text-sm font-semibold text-slate-800">
+                      Spesialisasi Terbanyak
+                    </h3>
+                  </div>
+                  <div className="space-y-2">
+                    {stats.bySpecialization.slice(0, 3).map((item, idx) => (
+                      <div
+                        key={item.specialization}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-slate-400 w-4">
+                            {idx + 1}.
+                          </span>
+                          <span className="text-sm text-slate-700 truncate max-w-[140px]">
+                            {item.specialization}
+                          </span>
+                        </div>
+                        <span className="text-sm font-semibold text-brand-steel">
+                          {item.count}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Batch Bento */}
+                <div className="bg-white rounded-2xl p-5 border border-slate-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <BarChart3 className="w-4 h-4 text-brand-steel" />
+                    <h3 className="text-sm font-semibold text-slate-800">
+                      Alumni per Angkatan
+                    </h3>
+                  </div>
+                  {(() => {
+                    const batchData =
+                      stats.byBatch && stats.byBatch.length > 0
+                        ? stats.byBatch.slice(-10)
+                        : stats.byYear.slice(-10);
+                    const maxCount = Math.max(
+                      ...batchData.map((y: any) => y.count),
+                      1,
+                    );
+                    const getLabel = (item: any) =>
+                      "batch" in item ? item.batch : item.year;
+                    const getRank = (item: any) => {
+                      const ratio = item.count / maxCount;
+                      if (ratio > 0.75) return 3;
+                      if (ratio > 0.4) return 2;
+                      if (ratio > 0.15) return 1;
+                      return 0;
+                    };
+                    const rankSpan: Record<number, string> = {
+                      3: "col-span-2 row-span-2",
+                      2: "col-span-2",
+                      1: "",
+                      0: "",
+                    };
+                    const rankBg: Record<number, string> = {
+                      3: "bg-brand-steel text-white",
+                      2: "bg-brand-steel/15 text-brand-steel",
+                      1: "bg-brand-steel/5 text-brand-steel",
+                      0: "bg-slate-50 text-slate-500",
+                    };
+                    return (
+                      <div className="grid grid-cols-4 gap-1 auto-rows-[2rem]">
+                        {batchData.map((item) => {
+                          const label = getLabel(item);
+                          const rank = getRank(item);
+                          return (
+                            <div
+                              key={String(label)}
+                              className={`rounded-md flex items-center justify-center transition-colors hover:opacity-80 cursor-default ${rankSpan[rank]} ${rankBg[rank]}`}
+                              title={`${label}: ${item.count} alumni`}
+                            >
+                              <span className="text-[10px] font-bold leading-none">
+                                {item.count}
+                              </span>
+                              <span className="text-[8px] opacity-60 leading-none ml-0.5">
+                                ({String(label)})
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Search & Filter */}
       <section className="px-[5%] md:px-[7%] lg:px-[10%] py-8 w-full bg-gray-50">
         <div className="max-w-6xl mx-auto space-y-4">
@@ -100,7 +327,7 @@ export default function AlumniPage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400" />
               <input
                 type="text"
-                placeholder="Cari alumni berdasarkan nama, instansi, spesialisasi..."
+                placeholder="Cari alumni berdasarkan nama, spesialisasi, lokasi..."
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
@@ -130,7 +357,7 @@ export default function AlumniPage() {
             >
               <Filter className="w-4 h-4" />
               <span className="hidden sm:inline">Filter</span>
-              {(filterYear || filterSpec) && (
+              {(filterYear || filterSpec || filterProvince) && (
                 <span className="w-2 h-2 bg-brand-dark rounded-full" />
               )}
             </button>
@@ -187,7 +414,7 @@ export default function AlumniPage() {
                 <option value="year_desc">Tahun (Terbaru)</option>
               </select>
 
-              {(filterYear || filterSpec) && (
+              {(filterYear || filterSpec || filterProvince) && (
                 <button
                   onClick={resetFilters}
                   className="text-xs text-red-500 hover:text-red-700 font-medium ml-auto"
@@ -201,7 +428,10 @@ export default function AlumniPage() {
       </section>
 
       {/* Alumni Grid */}
-      <section className="px-[5%] md:px-[7%] lg:px-[10%] pb-16 w-full bg-gray-50">
+      <section
+        id="alumni-list"
+        className="px-[5%] md:px-[7%] lg:px-[10%] pb-16 w-full bg-gray-50"
+      >
         <div className="max-w-6xl mx-auto">
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -252,9 +482,9 @@ export default function AlumniPage() {
                       {item.name}
                     </h3>
 
-                    {item.degree && (
+                    {formatDegree(item) && (
                       <p className="text-xs text-brand-dark font-medium mt-1">
-                        {item.degree}
+                        {formatDegree(item)}
                       </p>
                     )}
 
@@ -267,18 +497,29 @@ export default function AlumniPage() {
                       </div>
                     )}
 
-                    {item.institution && (
+                    {(item.province || item.city) && (
                       <div className="flex items-center justify-center gap-1 mt-1.5">
-                        <Building2 className="w-3 h-3 text-slate-400" />
+                        <MapPin className="w-3 h-3 text-slate-400" />
                         <span className="text-xs text-slate-500 truncate max-w-[180px]">
-                          {item.institution}
+                          {[item.city, item.province]
+                            .filter(Boolean)
+                            .join(", ")}
+                        </span>
+                      </div>
+                    )}
+
+                    {item.workHistories && item.workHistories.length > 0 && (
+                      <div className="flex items-center justify-center gap-1 mt-1.5">
+                        <Briefcase className="w-3 h-3 text-slate-400" />
+                        <span className="text-xs text-slate-500 truncate max-w-[180px]">
+                          {item.workHistories[0].institutionName}
                         </span>
                       </div>
                     )}
 
                     <div className="mt-3 inline-flex items-center gap-1 bg-brand-dark/5 text-brand-steel text-xs font-medium px-3 py-1 rounded-full">
                       <GraduationCap className="w-3 h-3" />
-                      Angkatan {item.graduationYear}
+                      Angkatan {item.batch || item.graduationYear}
                     </div>
                   </div>
                 </div>
@@ -338,6 +579,7 @@ export default function AlumniPage() {
           )}
         </div>
       </section>
+
       {/* Alumni Detail Modal */}
       {selectedAlumni && (
         <div
@@ -350,13 +592,13 @@ export default function AlumniPage() {
           >
             <button
               onClick={() => setSelectedAlumni(null)}
-              className="absolute top-4 right-4 p-1.5 bg-brand-steel/50 rounded-lg hover:bg-brand-steel/70 transition-colors"
+              className="absolute top-4 right-4 p-1.5 bg-brand-steel/50 rounded-lg hover:bg-brand-steel/70 transition-colors z-10"
             >
               <X className="w-4 h-4 text-white" />
             </button>
             {/* Header */}
-            <div className="px-6 py-8  flex">
-              <div className="flex flex-col items-center justify-start w-full ">
+            <div className="px-6 py-8 flex">
+              <div className="flex flex-col items-center justify-start w-full">
                 {selectedAlumni.photo ? (
                   <img
                     src={selectedAlumni.photo}
@@ -364,13 +606,16 @@ export default function AlumniPage() {
                     className="object-cover w-24 h-24 rounded-2xl border-2 border-white/30"
                   />
                 ) : (
-                  <span className="text-white text-3xl font-bold">
-                    {selectedAlumni.name[0]?.toUpperCase()}
-                  </span>
+                  <div className="w-24 h-24 rounded-2xl bg-brand-dark/10 flex items-center justify-center">
+                    <span className="text-brand-dark text-3xl font-bold">
+                      {selectedAlumni.name[0]?.toUpperCase()}
+                    </span>
+                  </div>
                 )}
                 <div className="mt-3 inline-flex items-center gap-1 bg-brand-dark/5 text-brand-steel text-xs font-medium px-3 py-1 rounded-full">
                   <GraduationCap className="w-3 h-3" />
-                  Angkatan {selectedAlumni.graduationYear}
+                  Angkatan{" "}
+                  {selectedAlumni.batch || selectedAlumni.graduationYear}
                 </div>
               </div>
             </div>
@@ -386,12 +631,12 @@ export default function AlumniPage() {
                     </div>
                   </div>
 
-                  {selectedAlumni.degree && (
+                  {formatDegree(selectedAlumni) && (
                     <div className="flex items-center gap-3">
                       <div>
                         <p className="text-xs text-slate-400">Gelar</p>
                         <p className="text-sm font-medium text-slate-700">
-                          {selectedAlumni.degree}
+                          {formatDegree(selectedAlumni)}
                         </p>
                       </div>
                     </div>
@@ -410,12 +655,14 @@ export default function AlumniPage() {
                     </div>
                   )}
 
-                  {selectedAlumni.institution && (
+                  {(selectedAlumni.province || selectedAlumni.city) && (
                     <div className="flex items-center gap-3">
                       <div>
-                        <p className="text-xs text-slate-400">Instansi</p>
+                        <p className="text-xs text-slate-400">Lokasi</p>
                         <p className="text-sm font-medium text-slate-700">
-                          {selectedAlumni.institution}
+                          {[selectedAlumni.city, selectedAlumni.province]
+                            .filter(Boolean)
+                            .join(", ")}
                         </p>
                       </div>
                     </div>
@@ -445,6 +692,42 @@ export default function AlumniPage() {
                     </div>
                   )}
                 </div>
+
+                {/* Work History in Modal */}
+                {selectedAlumni.workHistories &&
+                  selectedAlumni.workHistories.length > 0 && (
+                    <div className="border-t border-slate-100 pt-3 mt-2">
+                      <p className="text-xs text-slate-400 font-medium mb-2 flex items-center gap-1">
+                        <Briefcase className="w-3 h-3" />
+                        Riwayat Kerja
+                      </p>
+                      <div className="space-y-2 max-h-40 overflow-y-auto">
+                        {selectedAlumni.workHistories.map((wh) => (
+                          <div
+                            key={wh.id}
+                            className="bg-slate-50 rounded-lg p-2.5"
+                          >
+                            <p className="text-sm font-medium text-slate-700">
+                              {wh.institutionName}
+                            </p>
+                            <div className="flex items-center gap-3 mt-1">
+                              <span className="text-xs text-slate-500">
+                                {formatWorkPeriod(wh)}
+                              </span>
+                              {(wh.province || wh.city) && (
+                                <span className="text-xs text-slate-400 flex items-center gap-0.5">
+                                  <MapPin className="w-2.5 h-2.5" />
+                                  {[wh.city, wh.province]
+                                    .filter(Boolean)
+                                    .join(", ")}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
               </div>
             </div>
           </div>
