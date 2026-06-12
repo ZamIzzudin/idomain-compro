@@ -10,11 +10,12 @@ export default function AboutSection() {
   const { data: settings } = useSiteSettings();
 
   const siteName = settings?.site_name || "IDOMAIN";
-  const aboutTitle = settings?.about_title || `Tentang ${siteName}`;
+  const aboutTitle = settings?.home_about_title || settings?.about_title || `Tentang ${siteName}`;
   const aboutDesc =
+    settings?.home_about_description ||
     settings?.about_description ||
     "IDOMAIN adalah organisasi yang berdedikasi untuk memperkuat jejaring antar anggota, memfasilitasi kolaborasi lintas bidang, dan berkontribusi positif bagi masyarakat luas. Melalui berbagai program dan kegiatan, kami terus berupaya menciptakan dampak yang bermakna.";
-  const aboutImage = settings?.about_image;
+  const aboutImage = settings?.home_about_image || settings?.about_image;
 
   return (
     <section className="px-[5%] md:px-[7%] lg:px-[10%] py-16 md:py-24 w-full">

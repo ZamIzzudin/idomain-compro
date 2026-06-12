@@ -626,24 +626,13 @@ export default function AlumniPage() {
                     <div>
                       <p className="text-xs text-slate-400">Nama Lengkap</p>
                       <p className="text-sm font-medium text-slate-700">
+                        {`${selectedAlumni.degreePrefix} `}
                         {selectedAlumni.name}
+                        {` ${selectedAlumni.degreeSuffix} `}
                       </p>
                     </div>
                   </div>
 
-                  {formatDegree(selectedAlumni) && (
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <p className="text-xs text-slate-400">Gelar</p>
-                        <p className="text-sm font-medium text-slate-700">
-                          {formatDegree(selectedAlumni)}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2">
                   {selectedAlumni.specialization && (
                     <div className="flex items-center gap-3">
                       <div>
@@ -654,20 +643,20 @@ export default function AlumniPage() {
                       </div>
                     </div>
                   )}
-
-                  {(selectedAlumni.province || selectedAlumni.city) && (
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <p className="text-xs text-slate-400">Lokasi</p>
-                        <p className="text-sm font-medium text-slate-700">
-                          {[selectedAlumni.city, selectedAlumni.province]
-                            .filter(Boolean)
-                            .join(", ")}
-                        </p>
-                      </div>
-                    </div>
-                  )}
                 </div>
+
+                {(selectedAlumni.province || selectedAlumni.city) && (
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <p className="text-xs text-slate-400">Lokasi</p>
+                      <p className="text-sm font-medium text-slate-700">
+                        {[selectedAlumni.city, selectedAlumni.province]
+                          .filter(Boolean)
+                          .join(", ")}
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2">
                   {selectedAlumni.email && (
