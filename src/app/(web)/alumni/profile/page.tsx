@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import Container from "@/components/atomic/container";
+import ConfirmModal from "@/components/ConfirmModal";
 import {
   GraduationCap,
   Eye,
@@ -244,8 +245,8 @@ export default function AlumniProfilePage() {
       return;
     }
     const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error(`Ukuran file (${sizeMB} MB) melebihi batas maksimal 10 MB.`);
+    if (file.size > 1 * 1024 * 1024) {
+      toast.error(`Ukuran file (${sizeMB} MB) melebihi batas maksimal 1 MB.`);
       return;
     }
     setPhotoFile(file);
@@ -531,14 +532,21 @@ export default function AlumniProfilePage() {
     }
   };
 
-  const handleDeleteWH = (id: number) => {
-    if (!confirm("Yakin ingin menghapus riwayat kerja ini?")) return;
-    deleteWH(id, {
+  const [deleteWHTarget, setDeleteWHTarget] = useState<{ id: number; name: string } | null>(null);
+
+  const handleDeleteWH = (wh: any) => {
+    setDeleteWHTarget({ id: wh.id, name: wh.institutionName });
+  };
+
+  const confirmDeleteWH = () => {
+    if (!deleteWHTarget) return;
+    deleteWH(deleteWHTarget.id, {
       onError: (error: any) => {
         toast.error(
           error?.response?.data?.message || "Gagal menghapus riwayat kerja",
         );
       },
+      onSettled: () => setDeleteWHTarget(null),
     });
   };
 
@@ -1185,7 +1193,7 @@ export default function AlumniProfilePage() {
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDeleteWH(wh.id)}
+                        onClick={() => handleDeleteWH(wh)}
                         className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                         title="Hapus"
                       >
@@ -1361,6 +1369,15 @@ export default function AlumniProfilePage() {
           </div>
         </div>
       </section>
+
+      <ConfirmModal
+        open={!!deleteWHTarget}
+        title="Hapus Riwayat Pekerjaan"
+        message={`Apakah Anda yakin ingin menghapus riwayat pekerjaan di "${deleteWHTarget?.name}"?`}
+        confirmLabel="Ya, Hapus"
+        onConfirm={confirmDeleteWH}
+        onCancel={() => setDeleteWHTarget(null)}
+      />
     </Container>
   );
 }

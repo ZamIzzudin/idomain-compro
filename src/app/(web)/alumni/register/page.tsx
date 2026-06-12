@@ -49,6 +49,7 @@ export default function AlumniRegisterPage() {
 
   const [step, setStep] = useState<Step>("lookup");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [photoPreview, setPhotoPreview] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -183,8 +184,8 @@ export default function AlumniRegisterPage() {
       toast.error("Format file tidak didukung. Gunakan JPG, PNG, WebP, atau GIF.");
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("Ukuran file melebihi batas maksimal 10 MB.");
+    if (file.size > 1 * 1024 * 1024) {
+      toast.error("Ukuran file melebihi batas maksimal 1 MB.");
       return;
     }
     setPhotoFile(file);
@@ -270,10 +271,8 @@ export default function AlumniRegisterPage() {
         {
           onSuccess: (data: any) => {
             if (data.status === 200 || data.status === 201) {
-              toast.success(
-                data.data?.message ||
-                  "Data alumni berhasil diklaim!",
-              );
+              toast.success("Klaim alumni berhasil! Silakan login dengan akun Anda.");
+              router.push("/alumni/login");
             } else {
               toast.error(data.message || "Gagal mengklaim data alumni");
             }
@@ -297,10 +296,8 @@ export default function AlumniRegisterPage() {
         {
           onSuccess: (data: any) => {
             if (data.status === 201) {
-              toast.success(
-                data.data?.message ||
-                  "Registrasi berhasil! Akun Anda menunggu persetujuan admin.",
-              );
+              toast.success("Registrasi berhasil! Silakan login dengan akun Anda.");
+              router.push("/alumni/login");
             } else {
               toast.error(data.message || "Registrasi gagal");
             }
@@ -596,7 +593,7 @@ export default function AlumniRegisterPage() {
                   <p className="text-xs text-slate-400">
                     Format: JPG, PNG, WebP, GIF
                     <br />
-                    Maks: 10 MB
+                    Maks: 1 MB
                   </p>
                 </div>
               </div>
@@ -894,15 +891,28 @@ export default function AlumniRegisterPage() {
                   <label className="block text-sm font-medium text-slate-700 mb-1">
                     Konfirmasi Password *
                   </label>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={form.confirmPassword}
-                    onChange={(e) =>
-                      updateField("confirmPassword", e.target.value)
-                    }
-                    placeholder="Ulangi password"
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-transparent"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={form.confirmPassword}
+                      onChange={(e) =>
+                        updateField("confirmPassword", e.target.value)
+                      }
+                      placeholder="Ulangi password"
+                      className="w-full px-4 py-2.5 pr-10 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-transparent"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
 
