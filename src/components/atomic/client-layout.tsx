@@ -1,10 +1,11 @@
 "use client";
 
-import { Suspense, ReactNode, useEffect } from "react";
+import { Suspense, ReactNode, useEffect, useState, useCallback } from "react";
 import { Toaster } from "react-hot-toast";
 import { TanstackProvider } from "@/lib/tanstack";
 import Navbar from "./navbar";
 import Footer from "./footer";
+import SplashScreen from "@/components/SplashScreen";
 import { useSiteSettings } from "@/services/setting/hook";
 
 function FaviconSync() {
@@ -24,7 +25,25 @@ function FaviconSync() {
   return null;
 }
 
+const SPLASH_KEY = "splash_shown";
+
 export default function ClientLayout({ children }: { children: ReactNode }) {
+  const [showSplash, setShowSplash] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const shown = sessionStorage.getItem(SPLASH_KEY);
+    if (!shown) {
+      setShowSplash(true);
+    }
+    setMounted(true);
+  }, []);
+
+  const handleSplashFinished = useCallback(() => {
+    sessionStorage.setItem(SPLASH_KEY, "1");
+    setShowSplash(false);
+  }, []);
+
   return (
     <Suspense
       fallback={
@@ -68,6 +87,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
             },
           }}
         />
+        {mounted && showSplash && <SplashScreen onFinished={handleSplashFinished} />}
         <Navbar />
         {children}
         <Footer />
