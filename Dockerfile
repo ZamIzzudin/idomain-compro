@@ -4,7 +4,7 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 
 FROM base AS builder
 ARG NEXT_PUBLIC_API=http://localhost:8000/api/v1
