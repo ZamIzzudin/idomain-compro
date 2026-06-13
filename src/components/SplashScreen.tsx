@@ -8,18 +8,19 @@ export default function SplashScreen({
 }: {
   onFinished: () => void;
 }) {
-  const { data: settings } = useSiteSettings();
+  const { data: settings, isLoading } = useSiteSettings();
   const [visible, setVisible] = useState(true);
   const siteName = settings?.site_name || "IDOMAIN";
   const logo = settings?.site_logo;
 
   useEffect(() => {
+    if (isLoading) return;
     const timer = setTimeout(() => {
       setVisible(false);
       setTimeout(onFinished, 500);
     }, 1800);
     return () => clearTimeout(timer);
-  }, [onFinished]);
+  }, [onFinished, isLoading]);
 
   return (
     <div
