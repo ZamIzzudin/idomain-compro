@@ -12,15 +12,32 @@ import {
   Instagram,
   Youtube,
   Linkedin,
+  Twitter,
+  Globe,
 } from "lucide-react";
 import { useSiteSettings } from "@/services/setting/hook";
 
-const socialIcons: Record<string, any> = {
+const socialIconMap: Record<string, any> = {
   facebook: Facebook,
   instagram: Instagram,
   youtube: Youtube,
   linkedin: Linkedin,
+  twitter: Twitter,
+  tiktok: Globe,
+  whatsapp: Globe,
+  telegram: Globe,
+  github: Globe,
+  globe: Globe,
+  mail: Mail,
+  phone: Phone,
 };
+
+interface SocialLinkItem {
+  label: string;
+  url: string;
+  icon: string;
+  customIconUrl?: string;
+}
 
 export default function ContactPage() {
   const { data: settings } = useSiteSettings();
@@ -29,12 +46,33 @@ export default function ContactPage() {
   const email = settings?.contact_email || "";
   const address = settings?.contact_address || "";
 
-  const socialLinks = [
-    { key: "facebook", label: "Facebook", href: settings?.social_facebook },
-    { key: "instagram", label: "Instagram", href: settings?.social_instagram },
-    { key: "youtube", label: "YouTube", href: settings?.social_youtube },
-    { key: "linkedin", label: "LinkedIn", href: settings?.social_linkedin },
-  ].filter((s) => s.href);
+  let socialLinks: { label: string; href: string; icon: string; customIconUrl?: string }[] = [];
+
+  const socialLinksRaw = settings?.social_links;
+  if (socialLinksRaw) {
+    try {
+      const parsed = JSON.parse(socialLinksRaw);
+      if (Array.isArray(parsed)) {
+        socialLinks = parsed.filter((s: SocialLinkItem) => s.url).map((s: SocialLinkItem) => ({ label: s.label, href: s.url, icon: s.icon, customIconUrl: s.customIconUrl }));
+      }
+    } catch { /* ignore */ }
+  }
+
+  if (socialLinks.length === 0) {
+    const legacy = [
+      { key: "social_facebook", label: "Facebook", icon: "facebook" },
+      { key: "social_instagram", label: "Instagram", icon: "instagram" },
+      { key: "social_youtube", label: "YouTube", icon: "youtube" },
+      { key: "social_linkedin", label: "LinkedIn", icon: "linkedin" },
+      { key: "social_twitter", label: "Twitter/X", icon: "twitter" },
+    ];
+    for (const s of legacy) {
+      const val = settings?.[s.key as keyof typeof settings];
+      if (val) {
+        socialLinks.push({ label: s.label, href: val, icon: s.icon });
+      }
+    }
+  }
 
   return (
     <Container>
@@ -122,22 +160,27 @@ export default function ContactPage() {
                 {socialLinks.length > 0 && (
                   <div className="mt-8 pt-6 border-t border-white/10">
                     <div className="flex gap-3">
-                      {socialLinks.map((socmed) => {
-                        const Icon = socialIcons[socmed.key];
-                        if (!Icon) return null;
+                      {socialLinks.map((socmed, idx) => {
+                        const Icon = socialIconMap[socmed.icon];
                         return (
                           <a
-                            key={socmed.key}
+                            key={idx}
                             href={socmed.href}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-brand-mint transition-colors group"
                             aria-label={socmed.label}
                           >
-                            <Icon
-                              size={16}
-                              className="text-white group-hover:text-brand-dark transition-colors"
-                            />
+                            {socmed.customIconUrl && socmed.icon === "custom" ? (
+                              <img src={socmed.customIconUrl} alt={socmed.label} className="w-4 h-4 object-contain" />
+                            ) : Icon ? (
+                              <Icon
+                                size={16}
+                                className="text-white group-hover:text-brand-dark transition-colors"
+                              />
+                            ) : (
+                              <Globe size={16} className="text-white" />
+                            )}
                           </a>
                         );
                       })}

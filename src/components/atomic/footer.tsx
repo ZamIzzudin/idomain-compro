@@ -10,6 +10,8 @@ import {
   Instagram,
   Youtube,
   Linkedin,
+  Twitter,
+  Globe,
 } from "lucide-react";
 import { useSiteSettings } from "@/services/setting/hook";
 
@@ -22,12 +24,27 @@ const navLinks = [
   { label: "Kontak", href: "/contact" },
 ];
 
-const socialIcons: Record<string, any> = {
+const socialIconMap: Record<string, any> = {
   facebook: Facebook,
   instagram: Instagram,
   youtube: Youtube,
   linkedin: Linkedin,
+  twitter: Twitter,
+  tiktok: Globe,
+  whatsapp: Globe,
+  telegram: Globe,
+  github: Globe,
+  globe: Globe,
+  mail: Mail,
+  phone: Phone,
 };
+
+interface SocialLinkItem {
+  label: string;
+  url: string;
+  icon: string;
+  customIconUrl?: string;
+}
 
 const sectionStyle = {
   backgroundImage: "url(/bg-footer.png)",
@@ -47,12 +64,35 @@ export default function Footer() {
   const email = settings?.contact_email || "";
   const address = settings?.contact_address || "";
 
-  const socialLinks = [
-    { key: "facebook", label: "Facebook", href: settings?.social_facebook },
-    { key: "instagram", label: "Instagram", href: settings?.social_instagram },
-    { key: "youtube", label: "YouTube", href: settings?.social_youtube },
-    { key: "linkedin", label: "LinkedIn", href: settings?.social_linkedin },
-  ].filter((s) => s.href);
+  let socialLinks: { label: string; href: string; icon: string; customIconUrl?: string }[] = [];
+
+  // Try new dynamic format first
+  const socialLinksRaw = settings?.social_links;
+  if (socialLinksRaw) {
+    try {
+      const parsed = JSON.parse(socialLinksRaw);
+      if (Array.isArray(parsed)) {
+        socialLinks = parsed.filter((s: SocialLinkItem) => s.url).map((s: SocialLinkItem) => ({ label: s.label, href: s.url, icon: s.icon, customIconUrl: s.customIconUrl }));
+      }
+    } catch { /* ignore */ }
+  }
+
+  // Fallback to legacy social_* fields
+  if (socialLinks.length === 0) {
+    const legacy = [
+      { key: "social_facebook", label: "Facebook", icon: "facebook" },
+      { key: "social_instagram", label: "Instagram", icon: "instagram" },
+      { key: "social_youtube", label: "YouTube", icon: "youtube" },
+      { key: "social_linkedin", label: "LinkedIn", icon: "linkedin" },
+      { key: "social_twitter", label: "Twitter/X", icon: "twitter" },
+    ];
+    for (const s of legacy) {
+      const val = settings?.[s.key as keyof typeof settings];
+      if (val) {
+        socialLinks.push({ label: s.label, href: val, icon: s.icon });
+      }
+    }
+  }
 
   return (
     <footer className="bg-brand-dark text-white" style={sectionStyle}>
@@ -78,18 +118,23 @@ export default function Footer() {
             )}
             {socialLinks.length > 0 && (
               <div className="flex gap-4">
-                {socialLinks.map((socmed) => {
-                  const Icon = socialIcons[socmed.key];
-                  if (!Icon) return null;
+                {socialLinks.map((socmed, idx) => {
+                  const Icon = socialIconMap[socmed.icon];
                   return (
                     <Link
-                      key={socmed.key}
-                      href={socmed.href!}
+                      key={idx}
+                      href={socmed.href}
                       target="_blank"
                       className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
                       aria-label={socmed.label}
                     >
-                      <Icon size={18} />
+                      {socmed.customIconUrl && socmed.icon === "custom" ? (
+                        <img src={socmed.customIconUrl} alt={socmed.label} className="w-[18px] h-[18px] object-contain" />
+                      ) : Icon ? (
+                        <Icon size={18} />
+                      ) : (
+                        <Globe size={18} />
+                      )}
                     </Link>
                   );
                 })}
