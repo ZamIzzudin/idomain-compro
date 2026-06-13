@@ -4,6 +4,7 @@
 
 import { useParams } from "next/navigation";
 import Container from "@/components/atomic/container";
+import AnimateOnScroll from "@/components/atomic/animate-on-scroll";
 import { Calendar, ArrowLeft, User, Eye } from "lucide-react";
 import { useArticleBySlug } from "@/services/article/hook";
 
@@ -26,7 +27,7 @@ export default function ArticleDetailPage() {
   return (
     <Container>
       {/* Hero */}
-      <section className="bg-brand-steel text-white py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
+      <section className="bg-brand-steel text-white py-24 md:py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
         <div className="max-w-4xl mx-auto">
           <a
             href="/news"
@@ -46,7 +47,7 @@ export default function ArticleDetailPage() {
               <h1 className="text-[28px] md:text-[40px] font-bold mb-4 leading-tight">
                 {article.title}
               </h1>
-              <div className="flex items-center gap-4 text-sm text-gray-300">
+              <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-300">
                 <span className="flex items-center gap-1.5">
                   <User size={14} />
                   {article.author}
@@ -74,7 +75,7 @@ export default function ArticleDetailPage() {
             <img
               src={article.featuredImage}
               alt={article.title}
-              className="w-full h-64 md:h-96 object-cover rounded-2xl shadow-lg"
+              className="w-full h-48 md:h-96 object-cover rounded-2xl shadow-lg"
             />
           </div>
         </section>
@@ -92,7 +93,8 @@ export default function ArticleDetailPage() {
               <div className="h-4 bg-slate-200 rounded w-3/4" />
             </div>
           ) : article ? (
-            <>
+            <AnimateOnScroll>
+              <>
               {article.tags?.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-6">
                   {article.tags.map((tag) => (
@@ -112,7 +114,8 @@ export default function ArticleDetailPage() {
                   __html: article.content || "<p>No content available.</p>",
                 }}
               />
-            </>
+              </>
+            </AnimateOnScroll>
           ) : (
             <div className="text-center py-16">
               <p className="text-slate-500 text-lg">Artikel tidak ditemukan</p>

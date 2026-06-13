@@ -5,6 +5,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Container from "@/components/atomic/container";
+import AnimateOnScroll from "@/components/atomic/animate-on-scroll";
 import {
   Calendar,
   ArrowRight,
@@ -59,7 +60,7 @@ export default function NewsPage() {
   return (
     <Container>
       {/* Hero */}
-      <section className="bg-brand-steel text-white py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
+      <section className="bg-brand-steel text-white py-24 md:py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
         <div className="max-w-4xl mx-auto flex flex-col items-center">
           <h1 className="text-[32px] md:text-[48px] font-bold mb-4">
             News & Updates
@@ -153,6 +154,7 @@ export default function NewsPage() {
                             : "grid grid-cols-1 md:grid-cols-3";
 
                       return (
+                        <AnimateOnScroll key={ri} delay={ri * 0.1}>
                         <div key={ri} className={gridClass + " gap-6"}>
                           {row.items.map((article) => (
                             <Link
@@ -231,6 +233,7 @@ export default function NewsPage() {
                             </Link>
                           ))}
                         </div>
+                        </AnimateOnScroll>
                       );
                     })}
                   </div>

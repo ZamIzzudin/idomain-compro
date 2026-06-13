@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { usePublishedTestimonials } from "@/services/testimonial/hook";
+import AnimateOnScroll from "./atomic/animate-on-scroll";
 
 function TestimonialCard({
   item,
@@ -137,15 +138,17 @@ export default function TestimonialSection() {
       style={sectionStyle}
     >
       <div className="max-w-7xl mx-auto text-center place-items-center">
-        <p className="bg-brand-mint w-fit text-xs text-brand-dark px-4 rounded-full py-1 font-semibold">
-          Sepatah Kata
-        </p>
-        <div className="flex gap-3 items-baseline-last">
-          <h1 className="text-[28px] md:text-[52px] text-white font-semibold mb-8">
-            Dari Mereka
-          </h1>
-          <div className="h-5 w-5 bg-brand-steel"></div>
-        </div>
+        <AnimateOnScroll>
+          <p className="bg-brand-mint w-fit text-xs text-brand-dark px-4 rounded-full py-1 font-semibold">
+            Sepatah Kata
+          </p>
+          <div className="flex gap-3 items-baseline-last">
+            <h1 className="text-[28px] md:text-[52px] text-white font-semibold mb-8">
+              Dari Mereka
+            </h1>
+            <div className="h-5 w-5 bg-brand-steel"></div>
+          </div>
+        </AnimateOnScroll>
 
         <div
           ref={sliderRef}

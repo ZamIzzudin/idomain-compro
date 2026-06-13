@@ -4,6 +4,7 @@
 import { Calendar, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useArticleList } from "@/services/article/hook";
+import AnimateOnScroll from "./atomic/animate-on-scroll";
 
 export default function NewsSection() {
   const { data, isLoading } = useArticleList({
@@ -28,26 +29,28 @@ export default function NewsSection() {
     <section className="px-[5%] md:px-[7%] lg:px-[10%] py-16 md:py-24 bg-gray-50 w-full">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-10">
-          <div>
-            <div className="flex gap-3">
-              <h2 className="text-[28px] md:text-[52px] font-bold text-brand-steel">
-                News & Updates
-              </h2>
-              <div className="h-5 w-5 bg-brand-mint"></div>
+        <AnimateOnScroll>
+          <div className="flex items-center justify-between mb-10">
+            <div>
+              <div className="flex gap-3">
+                <h2 className="text-[28px] md:text-[52px] font-bold text-brand-steel">
+                  News & Updates
+                </h2>
+                <div className="h-5 w-5 bg-brand-mint"></div>
+              </div>
+              <p className="text-brand-steel mt-2">
+                Berita dan informasi terbaru dari kami
+              </p>
             </div>
-            <p className="text-brand-steel mt-2">
-              Berita dan informasi terbaru dari kami
-            </p>
+            <Link
+              href="/news"
+              className="hidden md:flex items-center gap-2 text-brand-steel font-semibold hover:gap-3 transition-all"
+            >
+              Selengkapnya
+              <ArrowRight size={18} />
+            </Link>
           </div>
-          <Link
-            href="/news"
-            className="hidden md:flex items-center gap-2 text-brand-steel font-semibold hover:gap-3 transition-all"
-          >
-            Selengkapnya
-            <ArrowRight size={18} />
-          </Link>
-        </div>
+        </AnimateOnScroll>
 
         {/* News Grid */}
         {isLoading ? (
@@ -72,12 +75,12 @@ export default function NewsSection() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 cursor-pointer">
-            {articles.map((article) => (
-              <Link
-                key={article.id}
-                href={`/news/${article.slug}`}
-                className="block"
-              >
+            {articles.map((article, i) => (
+              <AnimateOnScroll key={article.id} delay={i * 0.1}>
+                <Link
+                  href={`/news/${article.slug}`}
+                  className="block"
+                >
               <article
                 className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow group duration-300"
               >
@@ -126,6 +129,7 @@ export default function NewsSection() {
                 </div>
               </article>
               </Link>
+              </AnimateOnScroll>
             ))}
           </div>
         )}

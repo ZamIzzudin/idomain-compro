@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { useSiteSettings } from "@/services/setting/hook";
+import AnimateOnScroll from "./atomic/animate-on-scroll";
 
 export default function BentoGallery() {
   const { data: settings } = useSiteSettings();
@@ -45,14 +46,17 @@ export default function BentoGallery() {
   return (
     <section className="px-[5%] md:px-[7%] lg:px-[10%] py-16 md:py-24 w-full">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-10 flex justify-center gap-3">
-          <h2 className="text-[24px] md:text-[52px] font-bold text-brand-steel">
-            Galeri
-          </h2>
-          <div className="h-7 w-7 bg-brand-mint"></div>
-        </div>
+        <AnimateOnScroll>
+          <div className="text-center mb-10 flex justify-center gap-3">
+            <h2 className="text-[24px] md:text-[52px] font-bold text-brand-steel">
+              Galeri
+            </h2>
+            <div className="h-7 w-7 bg-brand-mint"></div>
+          </div>
+        </AnimateOnScroll>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 auto-rows-[180px] md:auto-rows-[220px] gap-3 md:gap-4">
+        <AnimateOnScroll delay={0.15}>
+          <div className="grid grid-cols-2 md:grid-cols-3 auto-rows-[180px] md:auto-rows-[220px] gap-3 md:gap-4">
           {images.map((src, idx) => {
             const cls = bentoClasses[idx % bentoClasses.length];
             return (
@@ -70,7 +74,8 @@ export default function BentoGallery() {
               </button>
             );
           })}
-        </div>
+          </div>
+        </AnimateOnScroll>
       </div>
 
       {/* Lightbox Preview */}

@@ -2,7 +2,10 @@
 
 import { Suspense, ReactNode, useEffect, useState, useCallback } from "react";
 import { Toaster } from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
 import { TanstackProvider } from "@/lib/tanstack";
+import AxiosClient from "@/lib/axios";
+import { clearToken } from "@/lib/auth";
 import Navbar from "./navbar";
 import Footer from "./footer";
 import SplashScreen from "@/components/SplashScreen";
@@ -21,6 +24,20 @@ function FaviconSync() {
     }
     link.href = settings.site_favicon;
   }, [settings?.site_favicon]);
+
+  return null;
+}
+
+function AuthGuard() {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    AxiosClient.setOnAuthExpired(() => {
+      clearToken();
+      queryClient.removeQueries({ queryKey: ["alumni_me"] });
+      queryClient.removeQueries({ queryKey: ["my_work_histories"] });
+    });
+  }, [queryClient]);
 
   return null;
 }
@@ -53,6 +70,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
       }
     >
       <TanstackProvider>
+        <AuthGuard />
         <FaviconSync />
         <Toaster
           position="top-right"

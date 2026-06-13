@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import Container from "@/components/atomic/container";
+import AnimateOnScroll from "@/components/atomic/animate-on-scroll";
 import {
   Eye,
   EyeOff,
@@ -317,7 +318,7 @@ export default function AlumniRegisterPage() {
 
   return (
     <Container>
-      <section className="bg-brand-steel text-white py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
+      <section className="bg-brand-steel text-white py-24 md:py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
         <div className="max-w-2xl mx-auto text-center flex flex-col items-center">
           <h1 className="text-[28px] md:text-[40px] font-bold mb-3 flex items-center justify-center gap-3">
             Registrasi Alumni
@@ -376,6 +377,7 @@ export default function AlumniRegisterPage() {
 
           {/* STEP 1: Lookup */}
           {step === "lookup" && (
+            <AnimateOnScroll>
             <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8">
               <div className="text-center mb-6">
                 <div className="w-16 h-16 bg-brand-dark/10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -433,10 +435,12 @@ export default function AlumniRegisterPage() {
                 </button>
               </form>
             </div>
+            </AnimateOnScroll>
           )}
 
           {/* STEP 2: Recommend */}
           {step === "recommend" && (
+            <AnimateOnScroll>
             <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8">
               <h2 className="text-lg font-bold text-slate-800 mb-2">
                 Data Ditemukan
@@ -522,6 +526,7 @@ export default function AlumniRegisterPage() {
                 Kembali
               </button>
             </div>
+            </AnimateOnScroll>
           )}
 
           {/* STEP 3: Form */}
@@ -603,8 +608,8 @@ export default function AlumniRegisterPage() {
                 <label className="block text-sm font-medium text-slate-700 mb-1">
                   Gelar Depan
                 </label>
-                <div className="flex gap-2 items-end">
-                  <div className="w-40 shrink-0">
+                <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
+                  <div className="w-full sm:w-40 shrink-0">
                     <select
                       value={form.degreePrefix}
                       onChange={(e) =>
@@ -644,7 +649,7 @@ export default function AlumniRegisterPage() {
                       className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-transparent"
                     />
                   </div>
-                  <div className="w-40 shrink-0">
+                  <div className="w-full sm:w-40 shrink-0">
                     <label className="block text-sm font-medium text-slate-700 mb-1">
                       Gelar Belakang
                     </label>

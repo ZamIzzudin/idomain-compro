@@ -4,6 +4,7 @@
 
 import { useParams } from "next/navigation";
 import Container from "@/components/atomic/container";
+import AnimateOnScroll from "@/components/atomic/animate-on-scroll";
 import { CalendarDays, ArrowLeft, User, Eye, MapPin } from "lucide-react";
 import { useEventBySlug } from "@/services/event/hook";
 
@@ -35,7 +36,7 @@ export default function EventDetailPage() {
   return (
     <Container>
       {/* Hero */}
-      <section className="bg-brand-steel text-white py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
+      <section className="bg-brand-steel text-white py-24 md:py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
         <div className="max-w-4xl mx-auto">
           <a
             href="/events"
@@ -55,7 +56,7 @@ export default function EventDetailPage() {
               <h1 className="text-[28px] md:text-[40px] font-bold mb-4 leading-tight">
                 {event.title}
               </h1>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300">
+              <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-300">
                 <span className="flex items-center gap-1.5">
                   <CalendarDays size={14} />
                   {formatDate(event.eventDate)}
@@ -94,7 +95,7 @@ export default function EventDetailPage() {
             <img
               src={event.featuredImage}
               alt={event.title}
-              className="w-full h-64 md:h-96 object-cover rounded-2xl shadow-lg"
+              className="w-full h-48 md:h-96 object-cover rounded-2xl shadow-lg"
             />
           </div>
         </section>
@@ -112,7 +113,8 @@ export default function EventDetailPage() {
               <div className="h-4 bg-slate-200 rounded w-3/4" />
             </div>
           ) : event ? (
-            <>
+            <AnimateOnScroll>
+              <>
               {event.tags?.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-6">
                   {event.tags.map((tag) => (
@@ -132,7 +134,8 @@ export default function EventDetailPage() {
                   __html: event.content || "<p>No content available.</p>",
                 }}
               />
-            </>
+              </>
+            </AnimateOnScroll>
           ) : (
             <div className="text-center py-16">
               <p className="text-slate-500 text-lg">Event tidak ditemukan</p>

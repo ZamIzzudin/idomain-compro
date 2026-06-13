@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import Container from "@/components/atomic/container";
+import AnimateOnScroll from "@/components/atomic/animate-on-scroll";
 import { GraduationCap, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useLoginAlumni } from "@/services/alumni/hook";
+import { setToken } from "@/lib/auth";
 
 export default function AlumniLoginPage() {
   const router = useRouter();
@@ -30,7 +32,7 @@ export default function AlumniLoginPage() {
       onSuccess: (data: any) => {
         if (data.status === 200) {
           if (typeof window !== "undefined" && data.data?.access_token) {
-            localStorage.setItem("alumni_token", data.data.access_token);
+            setToken(data.data.access_token);
           }
           toast.success("Login berhasil!");
           router.push("/alumni/profile");
@@ -49,7 +51,7 @@ export default function AlumniLoginPage() {
 
   return (
     <Container>
-      <section className="bg-brand-steel text-white py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
+      <section className="bg-brand-steel text-white py-24 md:py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
         <div className="max-w-2xl mx-auto text-center flex flex-col items-center">
           <h1 className="text-[28px] md:text-[40px] font-bold mb-3 flex items-center justify-center gap-3">
             Login Alumni
@@ -68,6 +70,7 @@ export default function AlumniLoginPage() {
             Kembali
           </Link>
 
+          <AnimateOnScroll>
           <form
             onSubmit={handleSubmit}
             className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 space-y-5"
@@ -133,6 +136,7 @@ export default function AlumniLoginPage() {
               </Link>
             </p>
           </form>
+          </AnimateOnScroll>
         </div>
       </section>
     </Container>

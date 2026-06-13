@@ -15,6 +15,7 @@ import {
   lookupAlumni,
   claimAlumni,
 } from "./service";
+import { isAuthenticated } from "@/lib/auth";
 
 export const useAlumniList = (params: {
   page?: number;
@@ -67,7 +68,11 @@ export const useMyProfile = () => {
   return useQuery({
     queryKey: ["alumni_me"],
     queryFn: fetchMyProfile,
-    enabled: typeof window !== "undefined" && !!localStorage.getItem("alumni_token"),
+    enabled: typeof window !== "undefined" && isAuthenticated(),
+    retry: (failureCount, error: any) => {
+      if (error?.response?.status === 401) return false;
+      return failureCount < 3;
+    },
     refetchOnWindowFocus: false,
   });
 };
@@ -87,7 +92,11 @@ export const useMyWorkHistories = () => {
   return useQuery({
     queryKey: ["my_work_histories"],
     queryFn: fetchMyWorkHistories,
-    enabled: typeof window !== "undefined" && !!localStorage.getItem("alumni_token"),
+    enabled: typeof window !== "undefined" && isAuthenticated(),
+    retry: (failureCount, error: any) => {
+      if (error?.response?.status === 401) return false;
+      return failureCount < 3;
+    },
     refetchOnWindowFocus: false,
   });
 };

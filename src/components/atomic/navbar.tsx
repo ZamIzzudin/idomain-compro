@@ -8,6 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Menu, X, ChevronDown, User, LogOut, ArrowRight } from "lucide-react";
 import { useSiteSettings } from "@/services/setting/hook";
 import { useMyProfile } from "@/services/alumni/hook";
+import { clearToken, getToken } from "@/lib/auth";
 
 interface NavLink {
   label: string;
@@ -46,7 +47,7 @@ export default function Navbar() {
   const siteName = settings?.site_name || "IDOMAIN";
 
   const handleLogout = () => {
-    localStorage.removeItem("alumni_token");
+    clearToken();
     queryClient.removeQueries({ queryKey: ["alumni_me"] });
     queryClient.removeQueries({ queryKey: ["my_work_histories"] });
     setProfileDropdown(false);
@@ -252,7 +253,7 @@ export default function Navbar() {
 
           {/* Mobile Toggle */}
           <button
-            className="md:hidden px-2 py-5 hover:bg-white/10 rounded-lg transition-colors"
+            className={`md:hidden px-2 py-5 hover:bg-white/10 rounded-lg transition-colors ${isScrolled ? "text-brand-steel" : "text-white"}`}
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             aria-label="Toggle menu"
           >

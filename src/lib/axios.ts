@@ -7,8 +7,11 @@ interface ApiConfig {
   timeout?: number;
 }
 
+type AuthExpiredCallback = () => void;
+
 class ApiClient {
   private instance: AxiosInstance;
+  private onAuthExpired: AuthExpiredCallback | null = null;
 
   constructor(config: ApiConfig = {}) {
     this.instance = axios.create({
@@ -26,6 +29,11 @@ class ApiClient {
     this.setupInterceptors();
   }
 
+  /** Register a callback that fires when a 401 is received */
+  public setOnAuthExpired(cb: AuthExpiredCallback) {
+    this.onAuthExpired = cb;
+  }
+
   private setupInterceptors() {
     this.instance.interceptors.request.use(
       (config) => {
@@ -38,6 +46,22 @@ class ApiClient {
         return config;
       },
       (error) => {
+        return Promise.reject(error);
+      }
+    );
+
+    this.instance.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (
+          typeof window !== "undefined" &&
+          error?.response?.status === 401
+        ) {
+          localStorage.removeItem("alumni_token");
+          if (this.onAuthExpired) {
+            this.onAuthExpired();
+          }
+        }
         return Promise.reject(error);
       }
     );

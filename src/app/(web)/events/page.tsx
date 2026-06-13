@@ -5,6 +5,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Container from "@/components/atomic/container";
+import AnimateOnScroll from "@/components/atomic/animate-on-scroll";
 import {
   CalendarDays,
   MapPin,
@@ -76,7 +77,7 @@ export default function EventsPage() {
   return (
     <Container>
       {/* Hero */}
-      <section className="bg-brand-steel text-white py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
+      <section className="bg-brand-steel text-white py-24 md:py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
         <div className="max-w-4xl mx-auto flex flex-col items-center">
           <h1 className="text-[32px] md:text-[48px] font-bold mb-4 flex items-center justify-center gap-3">
             Events & Programs
@@ -191,7 +192,8 @@ export default function EventsPage() {
                             : "grid grid-cols-1 md:grid-cols-3";
 
                       return (
-                        <div key={ri} className={`${gridClass} gap-3`}>
+                        <AnimateOnScroll key={ri} delay={ri * 0.1}>
+                        <div className={`${gridClass} gap-3`}>
                           {row.items.map((event) => {
                             const d = formatDate(event.eventDate);
                             const day = d.split(" ")[0];
@@ -210,12 +212,12 @@ export default function EventsPage() {
                                     className={`flex items-start flex-col ${isSingle ? "px-3 md:px-5 md:justify-start md:min-w-[100px]" : "px-3"}`}
                                   >
                                     <span
-                                      className={`${isSingle ? "text-8xl" : "text-5xl"} text-brand-steel block group-hover:text-white font-bold leading-none pb-1 mb-1`}
+                                      className={`${isSingle ? "text-5xl md:text-8xl" : "text-5xl"} text-brand-steel block group-hover:text-white font-bold leading-none pb-1 mb-1`}
                                     >
                                       {day}
                                     </span>
                                     <span
-                                      className={`group-hover:text-white text-brand-steel font-semibold ${isSingle ? "text-xl" : "text-sm"} text-center w-full`}
+                                      className={`group-hover:text-white text-brand-steel font-semibold ${isSingle ? "text-sm md:text-xl" : "text-sm"} text-center w-full`}
                                     >
                                       {monthYear}
                                     </span>
@@ -225,7 +227,7 @@ export default function EventsPage() {
                                     className={`flex-1 flex flex-col ${isSingle ? "" : "min-w-0"}`}
                                   >
                                     <div
-                                      className={`${isSingle ? "md:w-full h-56 md:h-72" : "h-40"} w-full shrink-0 overflow-hidden rounded-lg`}
+                                      className={`${isSingle ? "md:w-full h-48 md:h-72" : "h-40"} w-full shrink-0 overflow-hidden rounded-lg`}
                                     >
                                       {event.featuredImage ? (
                                         <img
@@ -266,7 +268,7 @@ export default function EventsPage() {
                                         </div>
                                       )}
                                       <h3
-                                        className={`${isSingle ? "text-xl" : "text-lg"} font-semibold text-brand-steel group-hover:text-white line-clamp-2`}
+                                        className={`${isSingle ? "text-lg md:text-xl" : "text-lg"} font-semibold text-brand-steel group-hover:text-white line-clamp-2`}
                                       >
                                         {event.title}
                                       </h3>
@@ -282,6 +284,7 @@ export default function EventsPage() {
                             );
                           })}
                         </div>
+                        </AnimateOnScroll>
                       );
                     })}
                   </div>

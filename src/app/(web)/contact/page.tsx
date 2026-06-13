@@ -3,6 +3,7 @@
 "use client";
 
 import Container from "@/components/atomic/container";
+import AnimateOnScroll from "@/components/atomic/animate-on-scroll";
 import {
   Phone,
   Mail,
@@ -77,7 +78,7 @@ export default function ContactPage() {
   return (
     <Container>
       {/* Hero */}
-      <section className="bg-brand-steel text-white py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
+      <section className="bg-brand-steel text-white py-24 md:py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
         <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
           <h1 className="text-[32px] md:text-[48px] font-bold mb-4">
             Hubungi Kami
@@ -91,7 +92,7 @@ export default function ContactPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             {/* Left - Contact Info */}
-            <div className="lg:col-span-2">
+            <AnimateOnScroll variant="slide-left" className="lg:col-span-2">
               <div className="bg-brand-steel rounded-2xl p-6 md:p-8 h-full flex flex-col">
                 <div className="flex gap-3 mb-8">
                   <div className="h-3 w-3 bg-brand-mint"></div>
@@ -188,10 +189,10 @@ export default function ContactPage() {
                   </div>
                 )}
               </div>
-            </div>
+            </AnimateOnScroll>
 
             {/* Right - Contact Form */}
-            <div className="lg:col-span-3">
+            <AnimateOnScroll variant="slide-right" className="lg:col-span-3">
               <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200">
                 <div className="flex gap-3 mb-8 justify-center">
                   <h2 className="text-2xl md:text-3xl font-bold text-brand-steel">
@@ -249,7 +250,7 @@ export default function ContactPage() {
                   </button>
                 </form>
               </div>
-            </div>
+            </AnimateOnScroll>
           </div>
         </div>
       </section>

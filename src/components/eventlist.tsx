@@ -4,6 +4,7 @@
 import { CalendarDays, MapPin, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useEventList } from "@/services/event/hook";
+import AnimateOnScroll from "./atomic/animate-on-scroll";
 
 export default function EventSection() {
   const { data, isLoading } = useEventList({
@@ -36,14 +37,16 @@ export default function EventSection() {
     <section className="px-[5%] md:px-[7%] lg:px-[10%] py-16 md:py-24 w-full">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-10">
-          <div className="flex gap-3 w-full justify-center">
-            <div className="h-7 w-7 bg-brand-mint"></div>
-            <h2 className="text-[28px] md:text-[52px] font-bold text-brand-steel text-center">
-              Events & Programs
-            </h2>
+        <AnimateOnScroll>
+          <div className="flex items-center justify-between mb-10">
+            <div className="flex gap-3 w-full justify-center">
+              <div className="h-7 w-7 bg-brand-mint"></div>
+              <h2 className="text-[28px] md:text-[52px] font-bold text-brand-steel text-center">
+                Events & Programs
+              </h2>
+            </div>
           </div>
-        </div>
+        </AnimateOnScroll>
 
         {/* Events List */}
         {isLoading ? (
@@ -71,11 +74,11 @@ export default function EventSection() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 cursor-pointer gap-3">
-            {events.map((event) => {
+            {events.map((event, i) => {
               const dataEvent = formatDate(event.eventDate);
               return (
+                <AnimateOnScroll key={event.id} delay={i * 0.1}>
                 <Link
-                  key={event.id}
                   href={`/events/${event.slug}`}
                   className="block"
                 >
@@ -84,16 +87,16 @@ export default function EventSection() {
                 >
                   <div className="flex flex-col p-4">
                     <div className="flex gap-3">
-                      <div className="flex items-start flex-col px-3">
-                        <span className="flex items-center w-fit gap-1 text-5xl text-brand-steel block group-hover:text-white justify-left pb-1 mb-1 font-bold">
+                      <div className="flex items-start flex-col px-2 md:px-3 shrink-0">
+                        <span className="flex items-center w-fit gap-1 text-3xl md:text-5xl text-brand-steel block group-hover:text-white justify-left pb-1 mb-1 font-bold leading-none">
                           {dataEvent.split(" ")[0]}
                         </span>
-                        <span className="group-hover:text-white flex items-center gap-1 text-xs text-brand-steel font-semibold">
+                        <span className="group-hover:text-white flex items-center gap-1 text-[10px] md:text-xs text-brand-steel font-semibold">
                           {dataEvent.split(" ")[1]} {dataEvent.split(" ")[2]}
                         </span>
                       </div>
-                      <div className="col-span-3 flex flex-col justify-center">
-                        <div className="w-full md:w-full h-40 md:h-auto shrink-0">
+                      <div className="flex-1 min-w-0 flex flex-col justify-center">
+                        <div className="w-full h-32 md:h-40 shrink-0 overflow-hidden rounded-lg">
                           {event.featuredImage ? (
                             <img
                               src={event.featuredImage}
@@ -124,10 +127,10 @@ export default function EventSection() {
                                 size={14}
                                 className="text-slate-400 group-hover:text-white"
                               />
-                              {event.location}
+                              <span className="truncate">{event.location}</span>
                             </div>
                           )}
-                          <h3 className="text-lg font-semibold text-brand-steel group-hover:text-white">
+                          <h3 className="text-base md:text-lg font-semibold text-brand-steel group-hover:text-white line-clamp-2">
                             {event.title}
                           </h3>
                         </div>
@@ -136,6 +139,7 @@ export default function EventSection() {
                   </div>
                 </article>
                 </Link>
+                </AnimateOnScroll>
               );
             })}
           </div>

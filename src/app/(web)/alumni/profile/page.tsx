@@ -7,6 +7,8 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import Container from "@/components/atomic/container";
 import ConfirmModal from "@/components/ConfirmModal";
+import AnimateOnScroll from "@/components/atomic/animate-on-scroll";
+import { isAuthenticated } from "@/lib/auth";
 import {
   GraduationCap,
   Eye,
@@ -51,7 +53,7 @@ export default function AlumniProfilePage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
-    if (!localStorage.getItem("alumni_token")) {
+    if (!isAuthenticated()) {
       router.push("/alumni/login");
     }
   }, []);
@@ -579,7 +581,7 @@ export default function AlumniProfilePage() {
   return (
     <Container>
       {/* Hero */}
-      <section className="bg-brand-steel text-white py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
+      <section className="bg-brand-steel text-white py-24 md:py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
         <div className="max-w-2xl mx-auto text-center flex items-center flex-col">
           <h1 className="text-[28px] md:text-[40px] font-bold mb-3 flex items-center justify-center gap-3">
             Profil Saya
@@ -678,8 +680,8 @@ export default function AlumniProfilePage() {
                   <label className="block text-sm font-medium text-slate-700 mb-1">
                     Gelar Depan
                   </label>
-                  <div className="flex gap-2 items-end">
-                    <div className="w-32 shrink-0">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
+                    <div className="w-full sm:w-32 shrink-0">
                       <select
                         value={form.degreePrefix}
                         onChange={(e) =>
@@ -719,7 +721,7 @@ export default function AlumniProfilePage() {
                         className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark focus:border-transparent"
                       />
                     </div>
-                    <div className="w-32 shrink-0">
+                    <div className="w-full sm:w-32 shrink-0">
                       <label className="block text-sm font-medium text-slate-700 mb-1">
                         Gelar Belakang
                       </label>

@@ -4,7 +4,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import Container from "@/components/atomic/container";
+import AnimateOnScroll from "@/components/atomic/animate-on-scroll";
+import CountUp from "@/components/atomic/count-up";
 import { useDebounce } from "@/hooks/useDebounce";
+import { isAuthenticated } from "@/lib/auth";
 import {
   Search,
   X,
@@ -83,7 +86,7 @@ export default function AlumniPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    setIsLoggedIn(!!localStorage.getItem("alumni_token"));
+    setIsLoggedIn(isAuthenticated());
   }, []);
 
   const formatDegree = (item: AlumniItem) => {
@@ -104,7 +107,7 @@ export default function AlumniPage() {
   return (
     <Container>
       {/* Hero */}
-      <section className="bg-brand-steel text-white py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
+      <section className="bg-brand-steel text-white py-24 md:py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
         <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
           <h1 className="text-[32px] md:text-[48px] font-bold flex items-center justify-center gap-3">
             Alumni
@@ -137,7 +140,8 @@ export default function AlumniPage() {
           <div className="max-w-6xl mx-auto">
             <div className="gap-5 flex flex-col">
               {/* Map */}
-              <div>
+              <AnimateOnScroll>
+                <div>
                 <div className="flex items-center gap-2 mb-4">
                   <MapPin className="w-5 h-5 text-brand-steel" />
                   <h2 className="text-lg font-bold text-slate-800">
@@ -176,10 +180,12 @@ export default function AlumniPage() {
                     </div>
                   )}
                 </div>
-              </div>
+                </div>
+              </AnimateOnScroll>
 
               {/* Stats Cards */}
-              <div className="space-y-4 grid grid-cols-4 gap-3">
+              <AnimateOnScroll delay={0.15}>
+                <div className="space-y-4 grid grid-cols-2 md:grid-cols-4 gap-3">
                 {/* Total Alumni */}
                 <div className="bg-brand-steel rounded-2xl p-5 text-white">
                   <div className="flex items-center gap-3 mb-2">
@@ -188,7 +194,9 @@ export default function AlumniPage() {
                       Total Alumni
                     </span>
                   </div>
-                  <p className="text-3xl font-bold">{stats.total}</p>
+                  <p className="text-3xl font-bold">
+                    <CountUp target={stats.total} />
+                  </p>
                 </div>
 
                 {/* Top Provinces */}
@@ -313,7 +321,8 @@ export default function AlumniPage() {
                     );
                   })()}
                 </div>
-              </div>
+                </div>
+              </AnimateOnScroll>
             </div>
           </div>
         </section>
@@ -455,9 +464,9 @@ export default function AlumniPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {alumni.map((item) => (
-                <div
-                  key={item.id}
+              {alumni.map((item, i) => (
+                <AnimateOnScroll key={item.id} delay={Math.min(i * 0.05, 0.3)}>
+                  <div
                   onClick={() => setSelectedAlumni(item)}
                   className="bg-white rounded-2xl p-6 border border-slate-100 hover:shadow-lg hover:border-slate-200 transition-all group cursor-pointer"
                 >
@@ -523,6 +532,7 @@ export default function AlumniPage() {
                     </div>
                   </div>
                 </div>
+                </AnimateOnScroll>
               ))}
             </div>
           )}
@@ -587,7 +597,7 @@ export default function AlumniPage() {
           onClick={() => setSelectedAlumni(null)}
         >
           <div
-            className="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex relative"
+            className="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col md:flex-row relative"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -597,17 +607,17 @@ export default function AlumniPage() {
               <X className="w-4 h-4 text-white" />
             </button>
             {/* Header */}
-            <div className="px-6 py-8 flex">
+            <div className="px-6 py-6 md:py-8 flex">
               <div className="flex flex-col items-center justify-start w-full">
                 {selectedAlumni.photo ? (
                   <img
                     src={selectedAlumni.photo}
                     alt={selectedAlumni.name}
-                    className="object-cover w-24 h-24 rounded-2xl border-2 border-white/30"
+                    className="object-cover w-20 h-20 md:w-24 md:h-24 rounded-2xl border-2 border-white/30"
                   />
                 ) : (
-                  <div className="w-24 h-24 rounded-2xl bg-brand-dark/10 flex items-center justify-center">
-                    <span className="text-brand-dark text-3xl font-bold">
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-brand-dark/10 flex items-center justify-center">
+                    <span className="text-brand-dark text-2xl md:text-3xl font-bold">
                       {selectedAlumni.name[0]?.toUpperCase()}
                     </span>
                   </div>
@@ -619,9 +629,9 @@ export default function AlumniPage() {
                 </div>
               </div>
             </div>
-            <div className="border border-slate-100 p-5 space-y-4 flex-1 flex w-full">
+            <div className="border-t md:border-t-0 md:border-l border-slate-100 p-5 space-y-4 flex-1 flex w-full">
               <div className="space-y-3 w-full flex flex-col justify-evenly">
-                <div className="grid grid-cols-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="flex items-center gap-3">
                     <div>
                       <p className="text-xs text-slate-400">Nama Lengkap</p>
@@ -658,7 +668,7 @@ export default function AlumniPage() {
                   </div>
                 )}
 
-                <div className="grid grid-cols-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {selectedAlumni.email && (
                     <div className="flex items-center gap-3">
                       <div>
