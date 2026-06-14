@@ -15,6 +15,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useCareerBySlug } from "@/services/career/hook";
+import { useMyProfile } from "@/services/alumni/hook";
 
 export default function CareerDetailPage() {
   const params = useParams();
@@ -22,6 +23,8 @@ export default function CareerDetailPage() {
 
   const { data, isLoading } = useCareerBySlug(slug);
   const career = data?.data;
+  const { data: myProfile } = useMyProfile();
+  const isLoggedIn = !!myProfile;
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return "";
@@ -179,53 +182,68 @@ export default function CareerDetailPage() {
                     <h3 className="text-sm font-semibold text-slate-700 mb-3">
                       Lamar Sekarang
                     </h3>
-                    {career.status === "CLOSED" ? (
-                      <div className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-slate-200 text-slate-400 rounded-xl font-medium text-sm cursor-not-allowed">
-                        Pendaftaran Ditutup
-                      </div>
-                    ) : (
-                      <a
-                        href={applyUrl}
-                        target={career.recruitmentUrl ? "_blank" : undefined}
-                        rel={
-                          career.recruitmentUrl
-                            ? "noopener noreferrer"
-                            : undefined
-                        }
-                        className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-brand-steel text-white rounded-xl font-medium hover:bg-brand-steel/80 transition-colors text-sm"
-                      >
-                        {career.recruitmentUrl
-                          ? "Daftar di Website"
-                          : "Kirim Lamaran"}
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
-                    )}
-
-                    {career.recruitmentEmail && (
-                      <a
-                        href={`mailto:${career.recruitmentEmail}`}
-                        className="flex items-center gap-2 mt-3 text-sm text-slate-500 hover:text-brand-steel transition-colors"
-                      >
-                        <Mail className="w-4 h-4 shrink-0" />
-                        <span className="truncate">
-                          {career.recruitmentEmail}
-                        </span>
-                      </a>
-                    )}
-
-                    {career.contactPerson && (
-                      <p className="flex items-center gap-2 mt-2 text-sm text-slate-500">
-                        <Phone className="w-4 h-4 shrink-0" />
-                        {career.contactPerson}
-                        {career.contactPhone && ` (${career.contactPhone})`}
-                      </p>
-                    )}
 
                     {career.deadline && (
-                      <p className="flex items-center gap-2 mt-3 text-xs text-amber-600 font-medium">
+                      <p className="flex items-center gap-2 mb-3 text-xs text-amber-600 font-medium">
                         <Calendar className="w-3.5 h-3.5" />
                         Batas: {formatDate(career.deadline)}
                       </p>
+                    )}
+
+                    {isLoggedIn ? (
+                      <>
+                        {career.status === "CLOSED" ? (
+                          <div className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-slate-200 text-slate-400 rounded-xl font-medium text-sm cursor-not-allowed">
+                            Pendaftaran Ditutup
+                          </div>
+                        ) : (
+                          <a
+                            href={applyUrl}
+                            target={career.recruitmentUrl ? "_blank" : undefined}
+                            rel={
+                              career.recruitmentUrl
+                                ? "noopener noreferrer"
+                                : undefined
+                            }
+                            className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-brand-steel text-white rounded-xl font-medium hover:bg-brand-steel/80 transition-colors text-sm"
+                          >
+                            {career.recruitmentUrl
+                              ? "Daftar di Website"
+                              : "Kirim Lamaran"}
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        )}
+
+                        {career.recruitmentEmail && (
+                          <a
+                            href={`mailto:${career.recruitmentEmail}`}
+                            className="flex items-center gap-2 mt-3 text-sm text-slate-500 hover:text-brand-steel transition-colors"
+                          >
+                            <Mail className="w-4 h-4 shrink-0" />
+                            <span className="truncate">
+                              {career.recruitmentEmail}
+                            </span>
+                          </a>
+                        )}
+
+                        {career.contactPerson && (
+                          <p className="flex items-center gap-2 mt-2 text-sm text-slate-500">
+                            <Phone className="w-4 h-4 shrink-0" />
+                            {career.contactPerson}
+                            {career.contactPhone && ` (${career.contactPhone})`}
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-500">
+                        <Link
+                          href="/alumni/login"
+                          className="font-semibold text-brand-steel hover:underline"
+                        >
+                          Login
+                        </Link>{" "}
+                        untuk melihat informasi pendaftaran.
+                      </div>
                     )}
                   </div>
                 )}

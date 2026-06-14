@@ -327,7 +327,7 @@ export default function CareerPage() {
             </div>
 
             {/* Right: Detail Panel */}
-            {selectedCareer && <CareerDetailPanel career={selectedCareer} />}
+            {selectedCareer && <CareerDetailPanel career={selectedCareer} isLoggedIn={!!myProfile} />}
           </div>
         )}
       </section>
@@ -337,6 +337,7 @@ export default function CareerPage() {
 
 function CareerDetailPanel({
   career,
+  isLoggedIn,
 }: {
   career: {
     id: number;
@@ -359,6 +360,7 @@ function CareerDetailPanel({
     category: { id: number; name: string; slug: string; type: string };
     author: { id: number; name: string; photo: string | null };
   };
+  isLoggedIn: boolean;
 }) {
   const requirements = career.requirements
     ?.split("\n")
@@ -452,45 +454,58 @@ function CareerDetailPanel({
             </span>
           )}
 
-          {/* Link pendaftaran sebagai button utama */}
-          {career.recruitmentUrl && (
-            career.status === "CLOSED" ? (
-              <span className="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 text-slate-400 rounded-xl font-medium text-sm mb-4 cursor-not-allowed">
-                Pendaftaran Ditutup
-              </span>
-            ) : (
-              <a
-                href={career.recruitmentUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-steel text-white rounded-xl font-medium hover:bg-brand-steel/80 transition-colors text-sm mb-4"
-              >
-                Daftar via Website
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            )
-          )}
+          {isLoggedIn ? (
+            <>
+              {/* Link pendaftaran sebagai button utama */}
+              {career.recruitmentUrl &&
+                (career.status === "CLOSED" ? (
+                  <span className="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 text-slate-400 rounded-xl font-medium text-sm mb-4 cursor-not-allowed">
+                    Pendaftaran Ditutup
+                  </span>
+                ) : (
+                  <a
+                    href={career.recruitmentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-brand-steel text-white rounded-xl font-medium hover:bg-brand-steel/80 transition-colors text-sm mb-4"
+                  >
+                    Daftar via Website
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                ))}
 
-          {/* Kontak Person (Nomor Telepon) - dengan Phone icon */}
-          {career.contactPerson && (
-            <p className="text-sm text-slate-500 flex items-center gap-2 mt-1">
-              <Phone className="w-4 h-4 text-slate-400 shrink-0" />
-              {career.contactPerson}
-              {career.contactPhone && ` (${career.contactPhone})`}
-            </p>
-          )}
+              {/* Contact Person (Nomor Telepon) - dengan Phone icon */}
+              {career.contactPerson && (
+                <p className="text-sm text-slate-500 flex items-center gap-2 mt-1">
+                  <Phone className="w-4 h-4 text-slate-400 shrink-0" />
+                  {career.contactPerson}
+                  {career.contactPhone && ` (${career.contactPhone})`}
+                </p>
+              )}
 
-          {/* Email rekrutmen - clickable mailto, ditebalkan */}
-          {career.recruitmentEmail && (
-            <p className="text-sm text-slate-500 flex items-center gap-2 mt-2">
-              <Mail className="w-4 h-4 text-slate-400 shrink-0" />
-              <a
-                href={`mailto:${career.recruitmentEmail}`}
-                className="font-bold text-brand-steel hover:underline"
+              {/* Email rekrutmen - clickable mailto, ditebalkan */}
+              {career.recruitmentEmail && (
+                <p className="text-sm text-slate-500 flex items-center gap-2 mt-2">
+                  <Mail className="w-4 h-4 text-slate-400 shrink-0" />
+                  <a
+                    href={`mailto:${career.recruitmentEmail}`}
+                    className="font-bold text-brand-steel hover:underline"
+                  >
+                    {career.recruitmentEmail}
+                  </a>
+                </p>
+              )}
+            </>
+          ) : (
+            <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-500">
+              <Link
+                href="/alumni/login"
+                className="font-semibold text-brand-steel hover:underline"
               >
-                {career.recruitmentEmail}
-              </a>
-            </p>
+                Login
+              </Link>{" "}
+              untuk melihat informasi pendaftaran.
+            </div>
           )}
         </div>
       )}

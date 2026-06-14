@@ -7,6 +7,7 @@ import Container from "@/components/atomic/container";
 import AnimateOnScroll from "@/components/atomic/animate-on-scroll";
 import { ArrowLeft, Briefcase } from "lucide-react";
 import toast from "react-hot-toast";
+import ListInput from "@/components/atomic/list-input";
 import { useCreateCareer, useCategoryList } from "@/services/career/hook";
 import { useMyProfile } from "@/services/alumni/hook";
 import { isAuthenticated } from "@/lib/auth";
@@ -32,8 +33,8 @@ export default function CareerNewPage() {
     city: "",
     jobType: "Penuh Waktu",
     categoryId: "",
-    description: "",
-    requirements: "",
+    description: [] as string[],
+    requirements: [] as string[],
     deadline: "",
     recruitmentEmail: "",
     recruitmentUrl: "",
@@ -94,8 +95,8 @@ export default function CareerNewPage() {
     if (form.city) formData.append("city", form.city);
     formData.append("jobType", form.jobType);
     formData.append("categoryId", form.categoryId);
-    if (form.description) formData.append("description", form.description);
-    if (form.requirements) formData.append("requirements", form.requirements);
+    if (form.description.length > 0) formData.append("description", form.description.filter(Boolean).join("\n"));
+    if (form.requirements.length > 0) formData.append("requirements", form.requirements.filter(Boolean).join("\n"));
     if (form.deadline) formData.append("deadline", form.deadline);
     if (form.recruitmentEmail)
       formData.append("recruitmentEmail", form.recruitmentEmail);
@@ -103,20 +104,17 @@ export default function CareerNewPage() {
       formData.append("recruitmentUrl", form.recruitmentUrl);
     if (form.contactPerson)
       formData.append("contactPerson", form.contactPerson);
-    if (form.contactPhone)
-      formData.append("contactPhone", form.contactPhone);
+    if (form.contactPhone) formData.append("contactPhone", form.contactPhone);
     if (logo) formData.append("logo", logo);
 
     create(formData, {
       onSuccess: () => {
-        toast.success(
-          "Lowongan berhasil dikirim! Menunggu persetujuan admin."
-        );
+        toast.success("Lowongan berhasil dikirim! Menunggu persetujuan admin.");
         router.push("/career");
       },
       onError: (error: any) => {
         toast.error(
-          error?.response?.data?.message || "Gagal mengirim lowongan"
+          error?.response?.data?.message || "Gagal mengirim lowongan",
         );
       },
     });
@@ -291,32 +289,28 @@ export default function CareerNewPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Deskripsi Pekerjaan
                 </label>
-                <textarea
-                  value={form.description}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, description: e.target.value }))
-                  }
-                  rows={4}
-                  placeholder="Deskripsi pekerjaan (satu poin per baris)"
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-steel resize-none"
+                <ListInput
+                  items={form.description}
+                  onChange={(items) => setForm((p) => ({ ...p, description: items }))}
+                  placeholder="Deskripsi pekerjaan..."
+                  addLabel="Tambah Deskripsi"
+                  emptyLabel="Belum ada deskripsi. Klik tambah untuk menambahkan."
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Persyaratan
                 </label>
-                <textarea
-                  value={form.requirements}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, requirements: e.target.value }))
-                  }
-                  rows={4}
-                  placeholder="Persyaratan (satu poin per baris)"
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-steel resize-none"
+                <ListInput
+                  items={form.requirements}
+                  onChange={(items) => setForm((p) => ({ ...p, requirements: items }))}
+                  placeholder="Persyaratan..."
+                  addLabel="Tambah Persyaratan"
+                  emptyLabel="Belum ada persyaratan. Klik tambah untuk menambahkan."
                 />
               </div>
 
@@ -358,39 +352,43 @@ export default function CareerNewPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Kontak Person
-                </label>
-                <input
-                  type="text"
-                  value={form.contactPerson}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, contactPerson: e.target.value }))
-                  }
-                  placeholder="Nama kontak (opsional)"
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-steel"
-                />
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Contact Person
+                  </label>
+                  <input
+                    type="text"
+                    value={form.contactPerson}
+                    onChange={(e) =>
+                      setForm((p) => ({ ...p, contactPerson: e.target.value }))
+                    }
+                    placeholder="Nama kontak (opsional)"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-steel"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Nomor Telepon Kontak (Opsional)
-                </label>
-                <input
-                  type="tel"
-                  inputMode="numeric"
-                  value={form.contactPhone}
-                  onChange={(e) =>
-                    setForm((p) => ({
-                      ...p,
-                      contactPhone: e.target.value.replace(/\D/g, "").slice(0, 14),
-                    }))
-                  }
-                  placeholder="08xxxxxxxxxxx"
-                  maxLength={14}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-steel"
-                />
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Nomor Telepon Kontak (Opsional)
+                  </label>
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    value={form.contactPhone}
+                    onChange={(e) =>
+                      setForm((p) => ({
+                        ...p,
+                        contactPhone: e.target.value
+                          .replace(/\D/g, "")
+                          .slice(0, 14),
+                      }))
+                    }
+                    placeholder="08xxxxxxxxxxx"
+                    maxLength={14}
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-steel"
+                  />
+                </div>
               </div>
 
               <div>
