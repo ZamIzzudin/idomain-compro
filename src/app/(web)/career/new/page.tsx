@@ -95,8 +95,16 @@ export default function CareerNewPage() {
     if (form.city) formData.append("city", form.city);
     formData.append("jobType", form.jobType);
     formData.append("categoryId", form.categoryId);
-    if (form.description.length > 0) formData.append("description", form.description.filter(Boolean).join("\n"));
-    if (form.requirements.length > 0) formData.append("requirements", form.requirements.filter(Boolean).join("\n"));
+    if (form.description.length > 0)
+      formData.append(
+        "description",
+        form.description.filter(Boolean).join("\n"),
+      );
+    if (form.requirements.length > 0)
+      formData.append(
+        "requirements",
+        form.requirements.filter(Boolean).join("\n"),
+      );
     if (form.deadline) formData.append("deadline", form.deadline);
     if (form.recruitmentEmail)
       formData.append("recruitmentEmail", form.recruitmentEmail);
@@ -125,7 +133,6 @@ export default function CareerNewPage() {
       <section className="bg-brand-steel text-white py-24 md:py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
         <div className="max-w-2xl mx-auto text-center">
           <h1 className="text-[28px] md:text-[40px] font-bold mb-3 flex items-center justify-center gap-3">
-            <Briefcase className="w-8 h-8" />
             Posting Lowongan
           </h1>
           <div className="h-[3px] w-[100px] bg-brand-mint mx-auto" />
@@ -294,7 +301,9 @@ export default function CareerNewPage() {
                 </label>
                 <ListInput
                   items={form.description}
-                  onChange={(items) => setForm((p) => ({ ...p, description: items }))}
+                  onChange={(items) =>
+                    setForm((p) => ({ ...p, description: items }))
+                  }
                   placeholder="Deskripsi pekerjaan..."
                   addLabel="Tambah Deskripsi"
                   emptyLabel="Belum ada deskripsi. Klik tambah untuk menambahkan."
@@ -307,7 +316,9 @@ export default function CareerNewPage() {
                 </label>
                 <ListInput
                   items={form.requirements}
-                  onChange={(items) => setForm((p) => ({ ...p, requirements: items }))}
+                  onChange={(items) =>
+                    setForm((p) => ({ ...p, requirements: items }))
+                  }
                   placeholder="Persyaratan..."
                   addLabel="Tambah Persyaratan"
                   emptyLabel="Belum ada persyaratan. Klik tambah untuk menambahkan."
