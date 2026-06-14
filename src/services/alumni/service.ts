@@ -54,18 +54,22 @@ export async function fetchAlumniList(params: {
   graduationYear?: number;
   specialization?: string;
   province?: string;
+  city?: string;
   sort?: string;
 }) {
   const { data } = await AxiosClient.get("/alumni", { params });
   return data as AlumniListResponse;
 }
 
-export async function fetchAlumniFilterOptions() {
-  const { data } = await AxiosClient.get("/alumni/filter-options");
+export async function fetchAlumniFilterOptions(province?: string) {
+  const { data } = await AxiosClient.get("/alumni/filter-options", {
+    params: province ? { province } : undefined,
+  });
   return data.data as {
     years: number[];
     specializations: string[];
     provinces: string[];
+    cities: string[];
   };
 }
 

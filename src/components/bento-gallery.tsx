@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { useSiteSettings } from "@/services/setting/hook";
+import { parseImageUrl } from "@/services/setting/service";
 import AnimateOnScroll from "./atomic/animate-on-scroll";
 
 export default function BentoGallery() {
@@ -57,7 +58,8 @@ export default function BentoGallery() {
 
         <AnimateOnScroll delay={0.15}>
           <div className="grid grid-cols-2 md:grid-cols-3 auto-rows-[180px] md:auto-rows-[220px] gap-3 md:gap-4">
-          {images.map((src, idx) => {
+          {images.map((raw, idx) => {
+            const src = parseImageUrl(raw);
             const cls = bentoClasses[idx % bentoClasses.length];
             return (
               <button
@@ -105,7 +107,7 @@ export default function BentoGallery() {
 
           {/* Image */}
           <img
-            src={images[previewIdx]}
+            src={parseImageUrl(images[previewIdx])}
             alt={`Gallery ${previewIdx + 1}`}
             className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg shadow-2xl select-none"
             onClick={(e) => e.stopPropagation()}

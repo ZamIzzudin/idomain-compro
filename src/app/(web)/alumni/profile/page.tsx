@@ -37,6 +37,7 @@ import AxiosClient from "@/lib/axios";
 import degreeData from "@/data/degree.json";
 import specializationData from "@/data/specialization.json";
 import locationData from "@/data/location.json";
+import PreferencePanel from "@/components/atomic/preference-panel";
 
 const degreePrefixes = (degreeData as any[]).filter(
   (d: any) => d.type === "prefix",
@@ -1369,6 +1370,13 @@ export default function AlumniProfilePage() {
               </div>
             )}
           </div>
+        </div>
+      </section>
+
+      {/* Notification Preferences */}
+      <section className="px-[5%] md:px-[7%] lg:px-[10%] pb-10 bg-gray-50">
+        <div className="max-w-3xl mx-auto">
+          <PreferencePanel />
         </div>
       </section>
 

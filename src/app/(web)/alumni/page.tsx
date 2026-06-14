@@ -55,6 +55,7 @@ export default function AlumniPage() {
   const [filterProvince, setFilterProvince] = useState<string | undefined>(
     undefined,
   );
+  const [filterCity, setFilterCity] = useState<string | undefined>(undefined);
 
   const debouncedSearch = useDebounce(search);
 
@@ -65,10 +66,11 @@ export default function AlumniPage() {
     graduationYear: filterYear,
     specialization: filterSpec,
     province: filterProvince,
+    city: filterCity,
     sort,
   });
 
-  const { data: filterOptions } = useAlumniFilterOptions();
+  const { data: filterOptions } = useAlumniFilterOptions(filterProvince);
   const { data: stats } = useAlumniStats();
 
   const alumni = data?.items || [];
@@ -79,6 +81,7 @@ export default function AlumniPage() {
     setFilterYear(undefined);
     setFilterSpec(undefined);
     setFilterProvince(undefined);
+    setFilterCity(undefined);
     setSort("newest");
     setPage(1);
   };
@@ -142,185 +145,185 @@ export default function AlumniPage() {
               {/* Map */}
               <AnimateOnScroll>
                 <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <MapPin className="w-5 h-5 text-brand-steel" />
-                  <h2 className="text-lg font-bold text-slate-800">
-                    Sebaran Alumni
-                  </h2>
-                </div>
-                <div>
-                  <IndonesiaAlumniMap
-                    data={stats.byProvince}
-                    selectedProvince={filterProvince}
-                    onProvinceClick={(province) => {
-                      setFilterProvince(province || undefined);
-                      setPage(1);
-                      if (province) {
-                        document
-                          .getElementById("alumni-list")
-                          ?.scrollIntoView({ behavior: "smooth" });
-                      }
-                    }}
-                  />
-                  {filterProvince && (
-                    <div className="flex items-center justify-center gap-2 mt-3 text-sm">
-                      <span className="text-slate-500">Filter:</span>
-                      <span className="font-medium text-brand-steel">
-                        {filterProvince}
-                      </span>
-                      <button
-                        onClick={() => {
-                          setFilterProvince(undefined);
-                          setPage(1);
-                        }}
-                        className="p-0.5 rounded-full bg-slate-200 hover:bg-slate-300 transition-colors"
-                      >
-                        <X className="w-3.5 h-3.5 text-slate-600" />
-                      </button>
-                    </div>
-                  )}
-                </div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <MapPin className="w-5 h-5 text-brand-steel" />
+                    <h2 className="text-lg font-bold text-slate-800">
+                      Sebaran Alumni
+                    </h2>
+                  </div>
+                  <div>
+                    <IndonesiaAlumniMap
+                      data={stats.byProvince}
+                      selectedProvince={filterProvince}
+                      onProvinceClick={(province) => {
+                        setFilterProvince(province || undefined);
+                        setPage(1);
+                        if (province) {
+                          document
+                            .getElementById("alumni-list")
+                            ?.scrollIntoView({ behavior: "smooth" });
+                        }
+                      }}
+                    />
+                    {filterProvince && (
+                      <div className="flex items-center justify-center gap-2 mt-3 text-sm">
+                        <span className="text-slate-500">Filter:</span>
+                        <span className="font-medium text-brand-steel">
+                          {filterProvince}
+                        </span>
+                        <button
+                          onClick={() => {
+                            setFilterProvince(undefined);
+                            setPage(1);
+                          }}
+                          className="p-0.5 rounded-full bg-slate-200 hover:bg-slate-300 transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5 text-slate-600" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </AnimateOnScroll>
 
               {/* Stats Cards */}
               <AnimateOnScroll delay={0.15}>
                 <div className="space-y-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-                {/* Total Alumni */}
-                <div className="bg-brand-steel rounded-2xl p-5 text-white">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Users className="w-5 h-5 opacity-80" />
-                    <span className="text-sm font-medium opacity-80">
-                      Total Alumni
-                    </span>
+                  {/* Total Alumni */}
+                  <div className="bg-brand-steel rounded-2xl p-5 text-white">
+                    <div className="flex items-center gap-3 mb-2">
+                      <Users className="w-5 h-5 opacity-80" />
+                      <span className="text-sm font-medium opacity-80">
+                        Total Alumni
+                      </span>
+                    </div>
+                    <p className="text-3xl font-bold">
+                      <CountUp target={stats.total} />
+                    </p>
                   </div>
-                  <p className="text-3xl font-bold">
-                    <CountUp target={stats.total} />
-                  </p>
-                </div>
 
-                {/* Top Provinces */}
-                <div className="bg-white rounded-2xl p-5 border border-slate-200">
-                  <div className="flex items-center gap-2 mb-3">
-                    <MapPin className="w-4 h-4 text-brand-dark" />
-                    <h3 className="text-sm font-semibold text-slate-800">
-                      Provinsi Terbanyak
-                    </h3>
-                  </div>
-                  <div className="space-y-2">
-                    {stats.byProvince.slice(0, 3).map((item, idx) => (
-                      <div
-                        key={item.province}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-medium text-slate-400 w-4">
-                            {idx + 1}.
-                          </span>
-                          <span className="text-sm text-slate-700 truncate max-w-[140px]">
-                            {item.province}
+                  {/* Top Provinces */}
+                  <div className="bg-white rounded-2xl p-5 border border-slate-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <MapPin className="w-4 h-4 text-brand-dark" />
+                      <h3 className="text-sm font-semibold text-slate-800">
+                        Provinsi Terbanyak
+                      </h3>
+                    </div>
+                    <div className="space-y-2">
+                      {stats.byProvince.slice(0, 3).map((item, idx) => (
+                        <div
+                          key={item.province}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-slate-400 w-4">
+                              {idx + 1}.
+                            </span>
+                            <span className="text-sm text-slate-700 truncate max-w-[140px]">
+                              {item.province}
+                            </span>
+                          </div>
+                          <span className="text-sm font-semibold text-brand-dark">
+                            {item.count}
                           </span>
                         </div>
-                        <span className="text-sm font-semibold text-brand-dark">
-                          {item.count}
-                        </span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
 
-                {/* Top Specializations */}
-                <div className="bg-white rounded-2xl p-5 border border-slate-200">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Award className="w-4 h-4 text-amber-500" />
-                    <h3 className="text-sm font-semibold text-slate-800">
-                      Spesialisasi Terbanyak
-                    </h3>
-                  </div>
-                  <div className="space-y-2">
-                    {stats.bySpecialization.slice(0, 3).map((item, idx) => (
-                      <div
-                        key={item.specialization}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-medium text-slate-400 w-4">
-                            {idx + 1}.
-                          </span>
-                          <span className="text-sm text-slate-700 truncate max-w-[140px]">
-                            {item.specialization}
+                  {/* Top Specializations */}
+                  <div className="bg-white rounded-2xl p-5 border border-slate-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Award className="w-4 h-4 text-amber-500" />
+                      <h3 className="text-sm font-semibold text-slate-800">
+                        Spesialisasi Terbanyak
+                      </h3>
+                    </div>
+                    <div className="space-y-2">
+                      {stats.bySpecialization.slice(0, 3).map((item, idx) => (
+                        <div
+                          key={item.specialization}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-slate-400 w-4">
+                              {idx + 1}.
+                            </span>
+                            <span className="text-sm text-slate-700 truncate max-w-[140px]">
+                              {item.specialization}
+                            </span>
+                          </div>
+                          <span className="text-sm font-semibold text-brand-steel">
+                            {item.count}
                           </span>
                         </div>
-                        <span className="text-sm font-semibold text-brand-steel">
-                          {item.count}
-                        </span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
 
-                {/* Batch Bento */}
-                <div className="bg-white rounded-2xl p-5 border border-slate-200">
-                  <div className="flex items-center gap-2 mb-3">
-                    <BarChart3 className="w-4 h-4 text-brand-steel" />
-                    <h3 className="text-sm font-semibold text-slate-800">
-                      Alumni per Angkatan
-                    </h3>
+                  {/* Batch Bento */}
+                  <div className="bg-white rounded-2xl p-5 border border-slate-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <BarChart3 className="w-4 h-4 text-brand-steel" />
+                      <h3 className="text-sm font-semibold text-slate-800">
+                        Alumni per Angkatan
+                      </h3>
+                    </div>
+                    {(() => {
+                      const batchData =
+                        stats.byBatch && stats.byBatch.length > 0
+                          ? stats.byBatch.slice(-10)
+                          : stats.byYear.slice(-10);
+                      const maxCount = Math.max(
+                        ...batchData.map((y: any) => y.count),
+                        1,
+                      );
+                      const getLabel = (item: any) =>
+                        "batch" in item ? item.batch : item.year;
+                      const getRank = (item: any) => {
+                        const ratio = item.count / maxCount;
+                        if (ratio > 0.75) return 3;
+                        if (ratio > 0.4) return 2;
+                        if (ratio > 0.15) return 1;
+                        return 0;
+                      };
+                      const rankSpan: Record<number, string> = {
+                        3: "col-span-2 row-span-2",
+                        2: "col-span-2",
+                        1: "",
+                        0: "",
+                      };
+                      const rankBg: Record<number, string> = {
+                        3: "bg-brand-steel text-white",
+                        2: "bg-brand-steel/15 text-brand-steel",
+                        1: "bg-brand-steel/5 text-brand-steel",
+                        0: "bg-slate-50 text-slate-500",
+                      };
+                      return (
+                        <div className="grid grid-cols-4 gap-1 auto-rows-[2rem]">
+                          {batchData.map((item) => {
+                            const label = getLabel(item);
+                            const rank = getRank(item);
+                            return (
+                              <div
+                                key={String(label)}
+                                className={`rounded-md flex items-center justify-center transition-colors hover:opacity-80 cursor-default ${rankSpan[rank]} ${rankBg[rank]}`}
+                                title={`${label}: ${item.count} alumni`}
+                              >
+                                <span className="text-[10px] font-bold leading-none">
+                                  {item.count}
+                                </span>
+                                <span className="text-[8px] opacity-60 leading-none ml-0.5">
+                                  ({String(label)})
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()}
                   </div>
-                  {(() => {
-                    const batchData =
-                      stats.byBatch && stats.byBatch.length > 0
-                        ? stats.byBatch.slice(-10)
-                        : stats.byYear.slice(-10);
-                    const maxCount = Math.max(
-                      ...batchData.map((y: any) => y.count),
-                      1,
-                    );
-                    const getLabel = (item: any) =>
-                      "batch" in item ? item.batch : item.year;
-                    const getRank = (item: any) => {
-                      const ratio = item.count / maxCount;
-                      if (ratio > 0.75) return 3;
-                      if (ratio > 0.4) return 2;
-                      if (ratio > 0.15) return 1;
-                      return 0;
-                    };
-                    const rankSpan: Record<number, string> = {
-                      3: "col-span-2 row-span-2",
-                      2: "col-span-2",
-                      1: "",
-                      0: "",
-                    };
-                    const rankBg: Record<number, string> = {
-                      3: "bg-brand-steel text-white",
-                      2: "bg-brand-steel/15 text-brand-steel",
-                      1: "bg-brand-steel/5 text-brand-steel",
-                      0: "bg-slate-50 text-slate-500",
-                    };
-                    return (
-                      <div className="grid grid-cols-4 gap-1 auto-rows-[2rem]">
-                        {batchData.map((item) => {
-                          const label = getLabel(item);
-                          const rank = getRank(item);
-                          return (
-                            <div
-                              key={String(label)}
-                              className={`rounded-md flex items-center justify-center transition-colors hover:opacity-80 cursor-default ${rankSpan[rank]} ${rankBg[rank]}`}
-                              title={`${label}: ${item.count} alumni`}
-                            >
-                              <span className="text-[10px] font-bold leading-none">
-                                {item.count}
-                              </span>
-                              <span className="text-[8px] opacity-60 leading-none ml-0.5">
-                                ({String(label)})
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })()}
-                </div>
                 </div>
               </AnimateOnScroll>
             </div>
@@ -366,7 +369,7 @@ export default function AlumniPage() {
             >
               <Filter className="w-4 h-4" />
               <span className="hidden sm:inline">Filter</span>
-              {(filterYear || filterSpec || filterProvince) && (
+              {(filterYear || filterSpec || filterProvince || filterCity) && (
                 <span className="w-2 h-2 bg-brand-dark rounded-full" />
               )}
             </button>
@@ -409,6 +412,40 @@ export default function AlumniPage() {
               </select>
 
               <select
+                value={filterProvince ?? ""}
+                onChange={(e) => {
+                  setFilterProvince(e.target.value || undefined);
+                  setFilterCity(undefined);
+                  setPage(1);
+                }}
+                className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark"
+              >
+                <option value="">Semua Provinsi</option>
+                {filterOptions?.provinces?.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={filterCity ?? ""}
+                onChange={(e) => {
+                  setFilterCity(e.target.value || undefined);
+                  setPage(1);
+                }}
+                disabled={!filterProvince}
+                className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <option value="">Semua Kota</option>
+                {filterOptions?.cities?.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+
+              <select
                 value={sort}
                 onChange={(e) => {
                   setSort(e.target.value);
@@ -423,7 +460,7 @@ export default function AlumniPage() {
                 <option value="year_desc">Tahun (Terbaru)</option>
               </select>
 
-              {(filterYear || filterSpec || filterProvince) && (
+              {(filterYear || filterSpec || filterProvince || filterCity) && (
                 <button
                   onClick={resetFilters}
                   className="text-xs text-red-500 hover:text-red-700 font-medium ml-auto"
@@ -467,71 +504,73 @@ export default function AlumniPage() {
               {alumni.map((item, i) => (
                 <AnimateOnScroll key={item.id} delay={Math.min(i * 0.05, 0.3)}>
                   <div
-                  onClick={() => setSelectedAlumni(item)}
-                  className="bg-white rounded-2xl p-6 border border-slate-100 hover:shadow-lg hover:border-slate-200 transition-all group cursor-pointer"
-                >
-                  {/* Photo */}
-                  <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-brand-dark to-brand-dark-hover flex items-center justify-center">
-                    {item.photo ? (
-                      <img
-                        src={item.photo}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-white text-2xl font-bold">
-                        {item.name[0]?.toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Info */}
-                  <div className="text-center">
-                    <h3 className="font-semibold text-slate-800 group-hover:text-brand-dark transition-colors">
-                      {item.name}
-                    </h3>
-
-                    {formatDegree(item) && (
-                      <p className="text-xs text-brand-dark font-medium mt-1">
-                        {formatDegree(item)}
-                      </p>
-                    )}
-
-                    {item.specialization && (
-                      <div className="flex items-center justify-center gap-1 mt-2">
-                        <Award className="w-3 h-3 text-amber-500" />
-                        <span className="text-xs text-slate-500">
-                          {item.specialization}
+                    onClick={() => setSelectedAlumni(item)}
+                    className="bg-white rounded-2xl p-6 border border-slate-100 hover:shadow-lg hover:border-slate-200 transition-all group cursor-pointer"
+                  >
+                    {/* Photo */}
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-brand-dark to-brand-dark-hover flex items-center justify-center">
+                      {item.photo ? (
+                        <img
+                          src={item.photo}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-white text-2xl font-bold">
+                          {item.name[0]?.toUpperCase()}
                         </span>
-                      </div>
-                    )}
+                      )}
+                    </div>
 
-                    {(item.province || item.city) && (
-                      <div className="flex items-center justify-center gap-1 mt-1.5">
-                        <MapPin className="w-3 h-3 text-slate-400" />
-                        <span className="text-xs text-slate-500 truncate max-w-[180px]">
-                          {[item.city, item.province]
-                            .filter(Boolean)
-                            .join(", ")}
-                        </span>
-                      </div>
-                    )}
+                    {/* Info */}
+                    <div className="text-center">
+                      <h3 className="font-semibold text-slate-800 group-hover:text-brand-dark transition-colors">
+                        {`${item.degreePrefix ? `${item.degreePrefix} ` : ""}`}
+                        {item.name}
+                        {`${item.degreeSuffix ? ` ${item.degreeSuffix}` : ""}`}
+                      </h3>
 
-                    {item.workHistories && item.workHistories.length > 0 && (
-                      <div className="flex items-center justify-center gap-1 mt-1.5">
-                        <Briefcase className="w-3 h-3 text-slate-400" />
-                        <span className="text-xs text-slate-500 truncate max-w-[180px]">
-                          {item.workHistories[0].institutionName}
-                        </span>
-                      </div>
-                    )}
+                      {/* {formatDegree(item) && (
+                        <p className="text-xs text-brand-dark font-medium mt-1">
+                          {formatDegree(item)}
+                        </p>
+                      )} */}
 
-                    <div className="mt-3 inline-flex items-center gap-1 bg-brand-dark/5 text-brand-steel text-xs font-medium px-3 py-1 rounded-full">
-                      <GraduationCap className="w-3 h-3" />
-                      Angkatan {item.batch || item.graduationYear}
+                      {item.specialization && (
+                        <div className="flex items-center justify-center gap-1 mt-2">
+                          <Award className="w-3 h-3 text-amber-500" />
+                          <span className="text-xs text-slate-500">
+                            {item.specialization}
+                          </span>
+                        </div>
+                      )}
+
+                      {(item.province || item.city) && (
+                        <div className="flex items-center justify-center gap-1 mt-1.5">
+                          <MapPin className="w-3 h-3 text-slate-400" />
+                          <span className="text-xs text-slate-500 truncate max-w-[180px]">
+                            {[item.city, item.province]
+                              .filter(Boolean)
+                              .join(", ")}
+                          </span>
+                        </div>
+                      )}
+
+                      {item.workHistories && item.workHistories.length > 0 && (
+                        <div className="flex items-center justify-center gap-1 mt-1.5">
+                          <Briefcase className="w-3 h-3 text-slate-400" />
+                          <span className="text-xs text-slate-500 truncate max-w-[180px]">
+                            {item.workHistories[0].institutionName}
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="mt-3 inline-flex items-center gap-1 bg-brand-dark/5 text-brand-steel text-xs font-medium px-3 py-1 rounded-full">
+                        <GraduationCap className="w-3 h-3" />
+                        Angkatan {item.batch || item.graduationYear}
+                      </div>
                     </div>
                   </div>
-                </div>
                 </AnimateOnScroll>
               ))}
             </div>
@@ -597,7 +636,7 @@ export default function AlumniPage() {
           onClick={() => setSelectedAlumni(null)}
         >
           <div
-            className="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col md:flex-row relative"
+            className="bg-white rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden flex flex-col md:flex-row relative"
             onClick={(e) => e.stopPropagation()}
           >
             <button

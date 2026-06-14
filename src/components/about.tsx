@@ -6,6 +6,7 @@ import AnimateOnScroll from "./atomic/animate-on-scroll";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useSiteSettings } from "@/services/setting/hook";
+import { parseImageUrl } from "@/services/setting/service";
 
 export default function AboutSection() {
   const { data: settings } = useSiteSettings();
@@ -16,7 +17,7 @@ export default function AboutSection() {
     settings?.home_about_description ||
     settings?.about_description ||
     "IDOMAIN adalah organisasi yang berdedikasi untuk memperkuat jejaring antar anggota, memfasilitasi kolaborasi lintas bidang, dan berkontribusi positif bagi masyarakat luas. Melalui berbagai program dan kegiatan, kami terus berupaya menciptakan dampak yang bermakna.";
-  const aboutImage = settings?.home_about_image || settings?.about_image;
+  const aboutImage = parseImageUrl(settings?.home_about_image) || parseImageUrl(settings?.about_image);
 
   return (
     <section className="px-[5%] md:px-[7%] lg:px-[10%] py-16 md:py-24 w-full">

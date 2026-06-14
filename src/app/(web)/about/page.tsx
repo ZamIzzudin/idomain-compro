@@ -6,6 +6,7 @@ import Container from "@/components/atomic/container";
 import BentoGallery from "@/components/bento-gallery";
 import AnimateOnScroll from "@/components/atomic/animate-on-scroll";
 import { useSiteSettings } from "@/services/setting/hook";
+import { parseImageUrl } from "@/services/setting/service";
 
 export default function AboutPage() {
   const { data: settings } = useSiteSettings();
@@ -16,7 +17,7 @@ export default function AboutPage() {
     "IDOMAIN didirikan dengan visi untuk menjadi organisasi yang berdampak positif bagi masyarakat. Kami percaya bahwa kolaborasi dan kebersamaan adalah kunci untuk mencapai tujuan bersama.";
   const aboutVisi = settings?.about_visi || "";
   const aboutMisi = settings?.about_misi || "";
-  const aboutImage = settings?.about_image;
+  const aboutImage = parseImageUrl(settings?.about_image);
 
   let misiItems: Array<{ title: string; subtitle: string }> = [];
   if (aboutMisi) {

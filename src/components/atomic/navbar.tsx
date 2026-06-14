@@ -7,8 +7,10 @@ import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
 import { Menu, X, ChevronDown, User, LogOut, ArrowRight } from "lucide-react";
 import { useSiteSettings } from "@/services/setting/hook";
+import { parseImageUrl } from "@/services/setting/service";
 import { useMyProfile } from "@/services/alumni/hook";
 import { clearToken, getToken } from "@/lib/auth";
+import NotificationPanel from "./notification-panel";
 
 interface NavLink {
   label: string;
@@ -21,13 +23,7 @@ const navLinks: NavLink[] = [
   { label: "Tentang Kami", href: "/about" },
   { label: "Alumni", href: "/alumni" },
   { label: "News", href: "/news" },
-  // {
-  //   label: "News & Updates",
-  //   href: "/news",
-  //   children: [
-  //     { label: "Press Release", href: "/news?category=press-release" },
-  //   ],
-  // },
+  { label: "Career", href: "/career" },
   { label: "Events", href: "/events" },
   { label: "Kontak", href: "/contact" },
 ];
@@ -98,7 +94,7 @@ export default function Navbar() {
             {settings?.site_logo ? (
               <div className="flex items-center gap-3">
                 <img
-                  src={settings.site_logo}
+                  src={parseImageUrl(settings.site_logo)}
                   alt={siteName}
                   className={`w-auto ${isScrolled ? "h-8 md:h-10" : "h-8 md:h-20"}`}
                 />
@@ -182,6 +178,8 @@ export default function Navbar() {
 
             {/* Auth / Profile */}
             {isLoggedIn ? (
+              <>
+              <NotificationPanel />
               <div
                 className="relative"
                 onMouseEnter={() => setProfileDropdown(true)}
@@ -241,6 +239,7 @@ export default function Navbar() {
                   </button>
                 </div>
               </div>
+              </>
             ) : (
               <Link
                 href="/alumni/login"
@@ -287,7 +286,7 @@ export default function Navbar() {
             <Link href="/" onClick={closeSidebar}>
               {settings?.site_logo ? (
                 <img
-                  src={settings.site_logo}
+                  src={parseImageUrl(settings.site_logo)}
                   alt={siteName}
                   className="h-8 w-auto"
                 />

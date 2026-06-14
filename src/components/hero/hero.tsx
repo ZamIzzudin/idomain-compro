@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSiteSettings } from "@/services/setting/hook";
+import { parseImageUrl } from "@/services/setting/service";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function Hero() {
@@ -51,14 +52,14 @@ export default function Hero() {
   return (
     <section className="relative w-full h-[100dvh] overflow-hidden">
       {/* Slides */}
-      {banners.map((url, index) => (
+      {banners.map((raw, index) => (
         <div
           key={index}
           className="absolute inset-0 transition-opacity duration-700 ease-in-out"
           style={{ opacity: index === currentIndex ? 1 : 0 }}
         >
           <img
-            src={url}
+            src={parseImageUrl(raw)}
             alt={`Banner ${index + 1}`}
             className="w-full h-full object-cover"
           />

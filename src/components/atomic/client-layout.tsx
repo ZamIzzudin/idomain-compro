@@ -6,10 +6,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import { TanstackProvider } from "@/lib/tanstack";
 import AxiosClient from "@/lib/axios";
 import { clearToken } from "@/lib/auth";
+import { registerServiceWorker } from "@/lib/push";
 import Navbar from "./navbar";
 import Footer from "./footer";
 import SplashScreen from "@/components/SplashScreen";
 import { useSiteSettings } from "@/services/setting/hook";
+import { parseImageUrl } from "@/services/setting/service";
 
 function FaviconSync() {
   const { data: settings } = useSiteSettings();
@@ -22,7 +24,7 @@ function FaviconSync() {
       link.rel = "icon";
       document.head.appendChild(link);
     }
-    link.href = settings.site_favicon;
+    link.href = parseImageUrl(settings.site_favicon);
   }, [settings?.site_favicon]);
 
   return null;
@@ -59,6 +61,10 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   const handleSplashFinished = useCallback(() => {
     sessionStorage.setItem(SPLASH_KEY, "1");
     setShowSplash(false);
+  }, []);
+
+  useEffect(() => {
+    registerServiceWorker();
   }, []);
 
   return (

@@ -17,6 +17,7 @@ import {
   Globe,
 } from "lucide-react";
 import { useSiteSettings } from "@/services/setting/hook";
+import { parseImageUrl } from "@/services/setting/service";
 
 const socialIconMap: Record<string, any> = {
   facebook: Facebook,
@@ -173,7 +174,7 @@ export default function ContactPage() {
                             aria-label={socmed.label}
                           >
                             {socmed.customIconUrl && socmed.icon === "custom" ? (
-                              <img src={socmed.customIconUrl} alt={socmed.label} className="w-4 h-4 object-contain" />
+                              <img src={parseImageUrl(socmed.customIconUrl)} alt={socmed.label} className="w-4 h-4 object-contain" />
                             ) : Icon ? (
                               <Icon
                                 size={16}

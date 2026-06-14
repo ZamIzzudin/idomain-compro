@@ -14,12 +14,14 @@ import {
   Globe,
 } from "lucide-react";
 import { useSiteSettings } from "@/services/setting/hook";
+import { parseImageUrl } from "@/services/setting/service";
 
 const navLinks = [
   { label: "Beranda", href: "/" },
   { label: "Tentang Kami", href: "/about" },
   { label: "Alumni", href: "/alumni" },
   { label: "News & Updates", href: "/news" },
+  { label: "Career", href: "/career" },
   { label: "Events", href: "/events" },
   { label: "Kontak", href: "/contact" },
 ];
@@ -56,7 +58,7 @@ export default function Footer() {
   const { data: settings } = useSiteSettings();
 
   const siteName = settings?.site_name || "IDOMAIN";
-  const siteLogo = settings?.site_logo;
+  const siteLogo = parseImageUrl(settings?.site_logo);
   const siteDesc =
     settings?.site_description ||
     "Website resmi organisasi yang berkomitmen untuk memperkuat jejaring dan berkontribusi bagi masyarakat melalui berbagai kegiatan.";
@@ -129,7 +131,7 @@ export default function Footer() {
                       aria-label={socmed.label}
                     >
                       {socmed.customIconUrl && socmed.icon === "custom" ? (
-                        <img src={socmed.customIconUrl} alt={socmed.label} className="w-[18px] h-[18px] object-contain" />
+                        <img src={parseImageUrl(socmed.customIconUrl)} alt={socmed.label} className="w-[18px] h-[18px] object-contain" />
                       ) : Icon ? (
                         <Icon size={18} />
                       ) : (

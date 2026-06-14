@@ -21,7 +21,6 @@ class ApiClient {
         "http://localhost:8000/api/v1",
       timeout: config.timeout || 10000,
       headers: {
-        "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
       },
     });
@@ -42,6 +41,9 @@ class ApiClient {
           if (token && config.headers) {
             config.headers["Authorization"] = `Bearer ${token}`;
           }
+        }
+        if (config.data instanceof FormData && config.headers) {
+          delete config.headers["Content-Type"];
         }
         return config;
       },

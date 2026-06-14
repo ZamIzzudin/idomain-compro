@@ -24,6 +24,7 @@ export const useAlumniList = (params: {
   graduationYear?: number;
   specialization?: string;
   province?: string;
+  city?: string;
   sort?: string;
 }) => {
   return useQuery({
@@ -33,10 +34,10 @@ export const useAlumniList = (params: {
   });
 };
 
-export const useAlumniFilterOptions = () => {
+export const useAlumniFilterOptions = (province?: string) => {
   return useQuery({
-    queryKey: ["alumni_filter_options"],
-    queryFn: fetchAlumniFilterOptions,
+    queryKey: ["alumni_filter_options", province],
+    queryFn: () => fetchAlumniFilterOptions(province),
     staleTime: 5 * 60 * 1000,
   });
 };

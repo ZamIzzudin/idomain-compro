@@ -32,3 +32,20 @@ export function settingsToMap(settings: SiteSettingItem[]): Record<string, strin
   });
   return map;
 }
+
+/**
+ * Parse a setting value that may be stored as JSON { url, publicId } or as a raw URL.
+ * Returns the display URL.
+ */
+export function parseImageUrl(value: string | null | undefined): string {
+  if (!value) return "";
+  try {
+    const parsed = JSON.parse(value);
+    if (parsed && typeof parsed === "object" && parsed.url) {
+      return parsed.url;
+    }
+  } catch {
+    // Legacy: raw URL string
+  }
+  return value;
+}

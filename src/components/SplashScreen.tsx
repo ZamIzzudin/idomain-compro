@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSiteSettings } from "@/services/setting/hook";
+import { parseImageUrl } from "@/services/setting/service";
 
 export default function SplashScreen({
   onFinished,
@@ -11,7 +12,7 @@ export default function SplashScreen({
   const { data: settings, isLoading } = useSiteSettings();
   const [visible, setVisible] = useState(true);
   const siteName = settings?.site_name || "IDOMAIN";
-  const logo = settings?.site_logo;
+  const logo = parseImageUrl(settings?.site_logo);
 
   useEffect(() => {
     if (isLoading) return;
