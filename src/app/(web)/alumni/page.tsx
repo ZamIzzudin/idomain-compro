@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import Container from "@/components/atomic/container";
+import { BreadcrumbJsonLd } from "@/components/atomic/json-ld";
 import AnimateOnScroll from "@/components/atomic/animate-on-scroll";
 import CountUp from "@/components/atomic/count-up";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -109,6 +110,12 @@ export default function AlumniPage() {
 
   return (
     <Container>
+      <BreadcrumbJsonLd
+        crumbs={[
+          { name: "Beranda", path: "/" },
+          { name: "Alumni", path: "/alumni" },
+        ]}
+      />
       {/* Hero */}
       <section className="bg-brand-steel text-white py-24 md:py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
         <div className="max-w-4xl mx-auto text-center flex flex-col items-center">

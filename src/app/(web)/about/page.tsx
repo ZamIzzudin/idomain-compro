@@ -3,6 +3,7 @@
 "use client";
 
 import Container from "@/components/atomic/container";
+import { BreadcrumbJsonLd } from "@/components/atomic/json-ld";
 import BentoGallery from "@/components/bento-gallery";
 import AnimateOnScroll from "@/components/atomic/animate-on-scroll";
 import { useSiteSettings } from "@/services/setting/hook";
@@ -14,7 +15,7 @@ export default function AboutPage() {
   const aboutTitle = settings?.about_title || "Tentang perusahan";
   const aboutDesc =
     settings?.about_description ||
-    "IDOMAIN didirikan dengan visi untuk menjadi organisasi yang berdampak positif bagi masyarakat. Kami percaya bahwa kolaborasi dan kebersamaan adalah kunci untuk mencapai tujuan bersama.";
+    "iDomain didirikan dengan visi untuk menjadi organisasi yang berdampak positif bagi masyarakat. Kami percaya bahwa kolaborasi dan kebersamaan adalah kunci untuk mencapai tujuan bersama.";
   const aboutVisi = settings?.about_visi || "";
   const aboutMisi = settings?.about_misi || "";
   const aboutImage = parseImageUrl(settings?.about_image);
@@ -62,6 +63,12 @@ export default function AboutPage() {
 
   return (
     <Container>
+      <BreadcrumbJsonLd
+        crumbs={[
+          { name: "Beranda", path: "/" },
+          { name: "Tentang Kami", path: "/about" },
+        ]}
+      />
       {/* Hero */}
       <section className="text-white py-24 md:py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full bg-brand-steel text-white">
         <div className="max-w-4xl mx-auto text-center flex flex-col items-center gap-2">

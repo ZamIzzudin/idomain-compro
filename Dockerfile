@@ -9,8 +9,10 @@ RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 FROM base AS builder
 ARG NEXT_PUBLIC_API=http://localhost:8000/api/v1
 ARG NEXT_PUBLIC_BASE_URL=http://localhost:3000
+ARG NEXT_PUBLIC_GSC_VERIFICATION
 ENV NEXT_PUBLIC_API=$NEXT_PUBLIC_API
 ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
+ENV NEXT_PUBLIC_GSC_VERIFICATION=$NEXT_PUBLIC_GSC_VERIFICATION
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .

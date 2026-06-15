@@ -5,28 +5,40 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 
 import "@/styles/globals.css";
 import ClientLayout from "@/components/atomic/client-layout";
+import { SiteJsonLd } from "@/components/atomic/json-ld";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL || "https://idomain.example.com";
 
 export const metadata: Metadata = {
-  title: "IDOMAIN",
-  description: "Website Resmi IDOMAIN",
+  title: "iDomain",
+  description: "Website Resmi iDomain",
   metadataBase: new URL(BASE_URL),
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "IDOMAIN",
+    title: "iDomain",
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
   openGraph: {
     type: "website",
     locale: "id_ID",
     url: BASE_URL,
+    siteName: "iDomain",
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GSC_VERIFICATION,
   },
 };
 
@@ -46,6 +58,7 @@ export default function RootLayout({
   return (
     <html lang="id" className={Font.className}>
       <body>
+        <SiteJsonLd />
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>

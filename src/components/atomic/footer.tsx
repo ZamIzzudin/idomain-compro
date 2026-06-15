@@ -57,7 +57,7 @@ const sectionStyle = {
 export default function Footer() {
   const { data: settings } = useSiteSettings();
 
-  const siteName = settings?.site_name || "IDOMAIN";
+  const siteName = settings?.site_name || "iDomain";
   const siteLogo = parseImageUrl(settings?.site_logo);
   const siteDesc =
     settings?.site_description ||
@@ -66,7 +66,12 @@ export default function Footer() {
   const email = settings?.contact_email || "";
   const address = settings?.contact_address || "";
 
-  let socialLinks: { label: string; href: string; icon: string; customIconUrl?: string }[] = [];
+  let socialLinks: {
+    label: string;
+    href: string;
+    icon: string;
+    customIconUrl?: string;
+  }[] = [];
 
   // Try new dynamic format first
   const socialLinksRaw = settings?.social_links;
@@ -74,9 +79,18 @@ export default function Footer() {
     try {
       const parsed = JSON.parse(socialLinksRaw);
       if (Array.isArray(parsed)) {
-        socialLinks = parsed.filter((s: SocialLinkItem) => s.url).map((s: SocialLinkItem) => ({ label: s.label, href: s.url, icon: s.icon, customIconUrl: s.customIconUrl }));
+        socialLinks = parsed
+          .filter((s: SocialLinkItem) => s.url)
+          .map((s: SocialLinkItem) => ({
+            label: s.label,
+            href: s.url,
+            icon: s.icon,
+            customIconUrl: s.customIconUrl,
+          }));
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   // Fallback to legacy social_* fields
@@ -131,7 +145,11 @@ export default function Footer() {
                       aria-label={socmed.label}
                     >
                       {socmed.customIconUrl && socmed.icon === "custom" ? (
-                        <img src={parseImageUrl(socmed.customIconUrl)} alt={socmed.label} className="w-[18px] h-[18px] object-contain" />
+                        <img
+                          src={parseImageUrl(socmed.customIconUrl)}
+                          alt={socmed.label}
+                          className="w-[18px] h-[18px] object-contain"
+                        />
                       ) : Icon ? (
                         <Icon size={18} />
                       ) : (

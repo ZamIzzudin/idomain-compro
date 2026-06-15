@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Container from "@/components/atomic/container";
+import { BreadcrumbJsonLd } from "@/components/atomic/json-ld";
 import AnimateOnScroll from "@/components/atomic/animate-on-scroll";
 import {
   ArrowLeft,
@@ -53,6 +54,13 @@ export default function CareerDetailPage() {
 
   return (
     <Container>
+      <BreadcrumbJsonLd
+        crumbs={[
+          { name: "Beranda", path: "/" },
+          { name: "Career", path: "/career" },
+          { name: career?.position || slug, path: `/career/${slug}` },
+        ]}
+      />
       {/* Hero */}
       <section className="bg-brand-steel text-white py-24 md:py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
         <div className="max-w-4xl mx-auto">

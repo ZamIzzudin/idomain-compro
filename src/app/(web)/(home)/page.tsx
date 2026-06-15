@@ -1,5 +1,3 @@
-/** @format */
-
 "use client";
 
 import Container from "@/components/atomic/container";

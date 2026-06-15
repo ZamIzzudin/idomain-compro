@@ -11,7 +11,7 @@ export default function SplashScreen({
 }) {
   const { data: settings, isLoading } = useSiteSettings();
   const [visible, setVisible] = useState(true);
-  const siteName = settings?.site_name || "IDOMAIN";
+  const siteName = settings?.site_name || "iDomain";
   const logo = parseImageUrl(settings?.site_logo);
 
   useEffect(() => {

@@ -4,6 +4,7 @@
 
 import { useParams } from "next/navigation";
 import Container from "@/components/atomic/container";
+import { BreadcrumbJsonLd } from "@/components/atomic/json-ld";
 import AnimateOnScroll from "@/components/atomic/animate-on-scroll";
 import { Calendar, ArrowLeft, User, Eye } from "lucide-react";
 import { useArticleBySlug } from "@/services/article/hook";
@@ -26,6 +27,13 @@ export default function ArticleDetailPage() {
 
   return (
     <Container>
+      <BreadcrumbJsonLd
+        crumbs={[
+          { name: "Beranda", path: "/" },
+          { name: "News", path: "/news" },
+          { name: article?.title || slug, path: `/news/${slug}` },
+        ]}
+      />
       {/* Hero */}
       <section className="bg-brand-steel text-white py-24 md:py-32 px-[5%] md:px-[7%] lg:px-[10%] w-full">
         <div className="max-w-4xl mx-auto">

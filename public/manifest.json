@@ -1,7 +1,7 @@
 {
-  "name": "IDOMAIN - Career & Alumni",
-  "short_name": "IDOMAIN",
-  "description": "Website Resmi IDOMAIN - Ikatan Dokter Muslim",
+  "name": "iDomain - Career & Alumni",
+  "short_name": "iDomain",
+  "description": "Website Resmi iDomain - Ikatan Dokter Muslim",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#135292",

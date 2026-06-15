@@ -1,4 +1,4 @@
-// IDOMAIN Service Worker - Push Notification Handler
+// iDomain Service Worker - Push Notification Handler
 // This file is placed in /public so it's served statically.
 // next-pwa will generate the main SW, this handles push events.
 
@@ -7,10 +7,10 @@ self.addEventListener("push", (event) => {
   try {
     data = event.data ? event.data.json() : {};
   } catch (e) {
-    data = { title: "IDOMAIN", body: event.data ? event.data.text() : "" };
+    data = { title: "iDomain", body: event.data ? event.data.text() : "" };
   }
 
-  const title = data.title || "IDOMAIN";
+  const title = data.title || "iDomain";
   const options = {
     body: data.body || "",
     icon: "/icon-192.png",
@@ -48,6 +48,6 @@ self.addEventListener("notificationclick", (event) => {
       if (self.clients.openWindow) {
         return self.clients.openWindow(targetUrl);
       }
-    })()
+    })(),
   );
 });
