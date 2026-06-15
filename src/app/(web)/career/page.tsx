@@ -334,7 +334,12 @@ export default function CareerPage() {
             </div>
 
             {/* Right: Detail Panel */}
-            {selectedCareer && <CareerDetailPanel career={selectedCareer} isLoggedIn={!!myProfile} />}
+            {selectedCareer && (
+              <CareerDetailPanel
+                career={selectedCareer}
+                isLoggedIn={!!myProfile}
+              />
+            )}
           </div>
         )}
       </section>
@@ -527,7 +532,7 @@ function CareerDetailPanel({
 
           {requirements && requirements.length > 0 && (
             <div className="mb-6">
-              <p className="text-xs font-semibold text-slate-500 uppercase mb-2">
+              <p className="text-xs font-semibold text-slate-500 mb-2">
                 Job Requirement
               </p>
               <ul className="space-y-2">
@@ -546,7 +551,7 @@ function CareerDetailPanel({
 
           {description && description.length > 0 && (
             <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase mb-2">
+              <p className="text-xs font-semibold text-slate-500 mb-2">
                 Job Description
               </p>
               <ul className="space-y-2">
