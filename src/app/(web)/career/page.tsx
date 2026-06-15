@@ -366,6 +366,7 @@ function CareerDetailPanel({
     status: string;
     category: { id: number; name: string; slug: string; type: string };
     author: { id: number; name: string; photo: string | null };
+    authorType: string;
   };
   isLoggedIn: boolean;
 }) {

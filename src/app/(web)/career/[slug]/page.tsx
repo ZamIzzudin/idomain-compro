@@ -271,14 +271,21 @@ export default function CareerDetailPage() {
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-brand-mint/30 flex items-center justify-center">
                         <span className="text-sm font-bold text-brand-steel">
-                          {career.author?.name?.charAt(0)}
+                          {career.author?.name?.charAt(0) || "A"}
                         </span>
                       </div>
                     )}
                     <div>
-                      <p className="text-sm font-medium text-slate-700">
-                        {career.author?.name}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-slate-700">
+                          {career.author?.name || "Unknown"}
+                        </p>
+                        {career.authorType === "ADMIN" && (
+                          <span className="px-2 py-0.5 rounded-full bg-brand-steel/10 text-brand-steel text-[10px] font-semibold">
+                            Admin
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-slate-400">
                         {formatDate(career.publishedAt || career.createdAt)}
                       </p>

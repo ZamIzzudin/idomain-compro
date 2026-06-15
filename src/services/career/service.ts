@@ -24,6 +24,7 @@ export interface CareerItem {
   createdAt: string;
   category: { id: number; name: string; slug: string; type: string };
   author: { id: number; name: string; photo: string | null };
+  authorType: string;
 }
 
 export interface CareerListResponse {
